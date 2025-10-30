@@ -31,69 +31,76 @@ Both projects can be started together inside a single **Docker container**, or e
 ---
 
 ### 🔧 Clean and Rebuild the Docker Image
+
 ```bash
 docker build -t etief-dashboard .
 ```
 
 ### Run the Container
+
 ```bash 
 docker run -d -p 8080:8080 etief-dashboard
 ```
 
-| Component                | URL                                                          |
-| ------------------------ | ------------------------------------------------------------ |
-| Landing Page             | [http://localhost:8080](http://localhost:8080)               |
-| technologies-exploration | [http://localhost:8080/page1/](http://localhost:8080/page1/) |
-| technologies-assessment  | [http://localhost:8080/page2/](http://localhost:8080/page2/) |
+Then open the following URLs in your browser:
 
-## 🏗️ Project Construction & Structure
+| Component	| URL |
+| ------------- |:-------------:|
+| Landing Page |	http://localhost:8080 |
+| technologies-exploration	| http://localhost:8080/page1/ |
+| technologies-assessment |	http://localhost:8080/page2/ |
+
+### 🏗️ Project Construction & Structure
 The Docker build process follows a multi-stage setup:
-Stage 1 – Build React Applications
+
+**Stage 1 – Build React Applications**
 Each sub-project (tech-dashboard-qmic and tech-dashboard-comp) is built using Node.js and Vite.
 Static assets are generated under their respective dist/ directories.
-Stage 2 – Assemble Final Web Server
+
+**Stage 2 – Assemble Final Web Server**
 The landing page (html/index.html) is copied to /app/html.
 The built React apps are placed under /app/html/page1 and /app/html/page2.
 A lightweight Python HTTP server is started on port 8080 to serve the combined structure.
-The final directory layout inside the container looks like this:
-
-```bash
-/app/html/
-├── index.html                 # Main landing page
-├── page1/                     # React app: technologies-exploration
-│   ├── index.html
-│   └── assets/
-└── page2/                     # React app: technologies-assessment
-    ├── index.html
-    └── assets/
-```
-This ensures both React dashboards and the landing page are accessible from the same container.
 
 ## 🧩 Run Each Project Independently
-f you want to run a specific sub-project locally without Docker:
-Change to the corresponding directory:
+If you want to run a specific sub-project locally without Docker:
+1. Change to the corresponding directory:
 
 ```bash
 cd technologies-exploration
 # or
 cd technologies-assessment
 ```
-Install dependencies:
 
+2. Install dependencies:
 ```bash
-imp install
+npm install
 ```
 
-## Start the development server:
+3. Start the development server:
 ```bash
 npm run dev
 ```
 
-Open the provided local URL (usually http://localhost:5173) in your browser.
+4. Open the provided local URL (usually http://localhost:5173) in your browser.
 
-## Open the provided local URL (usually http://localhost:5173) in your browser.
+## 🏗️ Project Structure
+
+```lua
+etief-dashboard/
+├── html/
+│   └── index.html                # Landing page
+├── technologies-exploration/     # React app (formerly page1)
+│   ├── package.json
+│   ├── vite.config.js
+│   └── src/
+└── technologies-assessment/      # React app (formerly page2)
+    ├── package.json
+    ├── vite.config.js
+    └── src/
+```
 
 ## 🧱 Technology Stack
-* React 18 + Vite — for front-end rendering and fast builds
-* Python HTTP Server — for lightweight static hosting
-* Docker (multi-stage) — for environment consistency and minimal runtime footprint
+- React 18 + Vite — for front-end rendering and fast builds
+- Python HTTP Server — for lightweight static hosting
+- Docker — for environment consistency and portability
