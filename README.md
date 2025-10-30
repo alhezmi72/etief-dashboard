@@ -1,13 +1,35 @@
-# This project aims to provide a web dashboard to explore a list of emerging technologies in 2025. The project includes two sub-projects: 
-# 1. technologies-exploration: This project lists potential technologies proposed by various LLM such as ChatGPT, Claudi.ai, Google Gemini, DeepSeek and allow the user to explore and navigate. 
-# 2. technologies-assessment: This project shows the assessment of a fixed emerging technologies conducted by various LLMs. 
-# Both projects can be started in a docker container or each can be started independently as a node.js.                    
-# Docker Container: 
-# Clean and rebuild the Docker image
-docker build -t etief-dashboard .
-# Run the container 
-docker run -d -p 8080:8080 etief-dashboard
+# Emerging Technologies Exploration & Assessment Dashboard (ETIEF)
 
-# To run each project independent 
-# change to the related directory and run
- npm run dev
+## 🌐 Introduction
+This project provides an interactive web dashboard to **explore and assess emerging technologies** expected to shape 2025 and beyond.
+
+It is structured into two sub-projects, each developed as a **React-based** application and combined into a single containerized web solution.
+
+---
+
+### 🚀 technologies-exploration
+This sub-project lists **potential emerging technologies** proposed by various Large Language Models (LLMs) such as:
+- ChatGPT  
+- Claude.ai  
+- Google Gemini  
+- DeepSeek  
+
+It allows users to **navigate, filter, and explore** technologies interactively.
+
+---
+
+### 🔍 technologies-assessment
+This sub-project presents the **assessment and evaluation** of a fixed set of emerging technologies, as analyzed by different LLMs.  
+It enables users to **compare insights** and view aggregated assessments across multiple AI models.
+
+---
+
+## 🐳 Run as a Docker Container
+
+Both projects can be started together inside a single **Docker container**, or each can be run independently using **Node.js**.
+
+---
+
+### 🔧 Clean and Rebuild the Docker Image
+```bash
+docker build -t etief-dashboard .
