@@ -47,19 +47,16 @@ Then open the following URLs in your browser:
 | Component	| URL |
 | ------------- |:-------------:|
 | Landing Page |	`http://localhost:8080` |
-| technologies-exploration	| `http://localhost:8080/page1/` |
-| technologies-assessment |	`http://localhost:8080/page2/` |
 
 ### 🏗️ Project Construction & Structure
 The Docker build process follows a multi-stage setup:
 
 **Stage 1 – Build React Applications**
-Each sub-project (`tech-dashboard-qmic` and `tech-dashboard-comp`) is built using Node.js and Vite.
+Build the application which is is based on Node.js and Vite.
 Static assets are generated under their respective dist/ directories.
 
 **Stage 2 – Assemble Final Web Server**
-The landing page (`html/index.html`) is copied to `/app/html`.
-The built React apps are placed under `/app/html/page1` and `/app/html/page2`.
+All files including the HTML and the JavaScripts are copied to /app/html 
 A lightweight Python HTTP server is started on port 8080 to serve the combined structure.
 
 ## 🧩 Run Each Project Independently
@@ -92,14 +89,7 @@ etief-dashboard/
 ├── package.json
 ├── vite.config.js
 └── src/                
-├── technologies-exploration/     # React app (formerly page1)
-│   ├── package.json
-│   ├── vite.config.js
-│   └── src/
-└── technologies-assessment/      # React app (formerly page2)
-    ├── package.json
-    ├── vite.config.js
-    └── src/
+
 ```
 
 ## 🧱 Technology Stack

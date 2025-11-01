@@ -3,27 +3,13 @@
 ############################################################
 FROM node:20-alpine AS builder
 
-# ----------- Build Landing Page (Main App) -----------
+# ----------- Build  The App -----------
 WORKDIR /build/landing
 COPY ./package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
 
-
-# Build Page 3
-WORKDIR /build/technologies-exploration
-COPY technologies-exploration/package*.json ./
-RUN npm install
-COPY technologies-exploration/ .
-RUN npm run build
-
-# Build Page 3
-WORKDIR /build/technologies-assessment
-COPY technologies-assessment/package*.json ./
-RUN npm install
-COPY technologies-assessment/ .
-RUN npm run build
 
 
 ############################################################
@@ -37,8 +23,6 @@ WORKDIR /app/html
 
 # Copy React build artifacts from builder stage
 COPY --from=builder /build/landing/dist ./ 
-COPY --from=builder /build/technologies-exploration/dist ./page1
-COPY --from=builder /build/technologies-assessment/dist ./page2
 
 # Expose port for HTTP server
 EXPOSE 8080
