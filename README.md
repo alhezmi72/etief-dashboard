@@ -88,8 +88,10 @@ npm run dev
 
 ```lua
 etief-dashboard/
-├── html/
-│   └── index.html                # Landing page
+├── index.html   # Landing page
+├── ├──package.json
+│   ├── vite.config.js
+│   └── src/                
 ├── technologies-exploration/     # React app (formerly page1)
 │   ├── package.json
 │   ├── vite.config.js
