@@ -726,7 +726,8 @@ const TechDashboard = () => {
             <div>
               <h1 style={styles.title}>Technology Assessment Dashboard 2025</h1>
               <p style={styles.subtitle}>
-                Hype Cycle Analysis & Comparison between different LLM assessments
+                Hype Cycle Analysis & Comparison between different LLM
+                assessments
               </p>
             </div>
             <div style={styles.exportBtns}>
