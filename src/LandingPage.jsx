@@ -349,7 +349,7 @@ const LandingPage = ({ setCurrentPage }) => {
           impact and time horizon:
         </p>
 
-        <div className="grid grid-cols-2 gap-5 mb-8 text-indigo-700">
+        <div className="grid grid-cols-2 gap-5 mb-8 text-gray-700">
           <MatrixQuadrant
             title="Quick Wins"
             desc="Short-term, high impact - Adopt soon"
