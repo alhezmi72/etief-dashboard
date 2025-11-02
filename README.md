@@ -59,22 +59,18 @@ Static assets are generated under their respective dist/ directories.
 All files including the HTML and the JavaScripts are copied to /app/html 
 A lightweight Python HTTP server is started on port 8080 to serve the combined structure.
 
-## 🧩 Run Each Project Independently
-If you want to run a specific sub-project locally without Docker:
-1. Change to the corresponding directory:
+## 🧩 Run the Project without Docker
+If you want to run the project locally without Docker:
 
-```bash
-cd technologies-exploration
-# or
-cd technologies-assessment
-```
+Run the following command: 
 
-2. Install dependencies:
+1. Install dependencies:
+
 ```bash
 npm install
 ```
 
-3. Start the development server:
+2. Start the development server:
 ```bash
 npm run dev
 ```
