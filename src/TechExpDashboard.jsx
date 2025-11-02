@@ -21,7 +21,6 @@ import {
   dataSources,
 } from "./techExplorationData";
 
-
 const TechExpDashboard = ({ setCurrentPage }) => {
   const [dataSource, setDataSource] = useState("claude");
   const [technologies, setTechnologies] = useState(technologiesClaude);
@@ -70,9 +69,10 @@ const TechExpDashboard = ({ setCurrentPage }) => {
     const score =
       tech.trl * weights.trl +
       tech.impact * weights.impact +
+      tech.strategicFit * weights.strategicFit +
       (10 - tech.barriers) * Math.abs(weights.barriers) +
-      (10 - tech.sustainability) * weights.sustainability +
-      tech.strategicFit * weights.strategicFit;
+      (10 - tech.sustainability) * weights.sustainability;
+      
     return Math.max(0, Math.min(10, score)).toFixed(2);
   };
 
@@ -227,7 +227,6 @@ const TechExpDashboard = ({ setCurrentPage }) => {
               { id: "hype", label: "Hype Cycle", icon: RefreshCw },
               { id: "matrix", label: "Strategic Matrix", icon: Grid },
               { id: "table", label: "Impact Assessment", icon: FileText },
-              
             ].map((view) => (
               <button
                 key={view.id}
@@ -678,7 +677,19 @@ const TechExpDashboard = ({ setCurrentPage }) => {
                               {tech.trl}/9
                             </span>
                           </td>
-                          <td className="p-3 text-center">{tech.impact}/10</td>
+                          <td className="p-3 text-center">
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                tech.impact >= 8
+                                  ? "bg-green-100 text-green-800 border border-green-300"
+                                  : tech.impact >= 6
+                                  ? "bg-yellow-100 text-yellow-800 border border-yellow-300"
+                                  : "bg-red-100 text-red-800 border border-red-300"
+                              }`}
+                            >
+                              {tech.impact}/10
+                            </span>
+                          </td>
                           <td className="p-3 text-center">
                             <span
                               className={`px-2 py-1 rounded-full text-xs font-semibold ${
@@ -693,10 +704,30 @@ const TechExpDashboard = ({ setCurrentPage }) => {
                             </span>
                           </td>
                           <td className="p-3 text-center">
-                            {tech.barriers}/10
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                tech.barriers <= 3
+                                  ? "bg-green-100 text-green-800 border border-green-300"
+                                  : tech.barriers <= 6
+                                  ? "bg-yellow-100 text-yellow-800 border border-yellow-300"
+                                  : "bg-red-100 text-red-800 border border-red-300"
+                              }`}
+                            >
+                              {tech.barriers}/10
+                            </span>
                           </td>
                           <td className="p-3 text-center">
-                            {tech.sustainability}/10
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                tech.sustainability <= 3
+                                  ? "bg-green-100 text-green-800 border border-green-300"
+                                  : tech.sustainability <= 6
+                                  ? "bg-yellow-100 text-yellow-800 border border-yellow-300"
+                                  : "bg-red-100 text-red-800 border border-red-300"
+                              }`}
+                            >
+                              {tech.sustainability}/10
+                            </span>
                           </td>
                           <td className="p-3 text-center">
                             <span
@@ -727,10 +758,10 @@ const TechExpDashboard = ({ setCurrentPage }) => {
               </h3>
               <div className="bg-white p-4 rounded border border-gray-300 font-mono text-sm">
                 TIS = (TRL × {weights.trl.toFixed(2)}) + (Impact ×{" "}
-                {weights.impact.toFixed(2)}) + ((10 - Barriers) ×{" "}
+                {weights.impact.toFixed(2)}) + (Strategic Fit ×{" "}
+                {weights.strategicFit.toFixed(2)}) + ((10 - Barriers) ×{" "}
                 {Math.abs(weights.barriers).toFixed(2)}) + ((10 -
-                Sustainability) × {weights.sustainability.toFixed(2)}) +
-                (Strategic Fit × {weights.strategicFit.toFixed(2)})
+                Sustainability) × {weights.sustainability.toFixed(2)})
               </div>
               <p className="text-sm text-gray-600 mt-3">
                 Adjust the weight controls above to re-score technologies in
