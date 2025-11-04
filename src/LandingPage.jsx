@@ -9,8 +9,7 @@ import {
   ArrowRight,
   ExternalLink,
   PieChart,
-  Home,
-  ArrowLeft,
+  Wrench,
 } from "lucide-react";
 
 const LandingPage = ({ setCurrentPage }) => {
@@ -169,44 +168,7 @@ const LandingPage = ({ setCurrentPage }) => {
           ))}
         </div>
       </section>
-
-      <section className="bg-white p-8 rounded-lg shadow-md border-l-4 border-indigo-500">
-        <h2 className="text-2xl font-bold mb-6 text-gray-900">
-          Framework Tools
-        </h2>
-        <p className="text-gray-700 mb-6">
-          Explore our interactive tools to apply this framework:
-        </p>
-        <div className="grid md:grid-cols-2 gap-6">
-          <button
-            onClick={() => setCurrentPage("exploration")}
-            className="group block p-6 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg shadow-md hover:shadow-xl transition-all hover:-translate-y-1 text-white text-left border-none cursor-pointer"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xl font-bold">
-                Emerging Technology Exploration
-              </h3>
-              <ExternalLink className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-            </div>
-            <p className="text-teal-50">
-              Explore emerging technologies via various Machine Learning
-              Language models
-            </p>
-          </button>
-          <button
-            onClick={() => setCurrentPage("assessment")}
-            className="group block p-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md hover:shadow-xl transition-all hover:-translate-y-1 text-white text-left border-none cursor-pointer"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xl font-bold">Technology Assessment</h3>
-              <ExternalLink className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-            </div>
-            <p className="text-blue-50">
-              Assess and evaluate a list of emerging technologies
-            </p>
-          </button>
-        </div>
-      </section>
+      <div>{renderTools()}</div>
     </div>
   );
 
@@ -807,8 +769,47 @@ const LandingPage = ({ setCurrentPage }) => {
     { id: "stage2", label: "Stage 2", icon: ClipboardCheck },
     { id: "stage3", label: "Stage 3", icon: Map },
     { id: "stage4", label: "Stage 4", icon: Activity },
-    { id: "report", label: "Risk Report",  icon: PieChart },
+    { id: "report", label: "Risk Report", icon: PieChart },
+    { id: "tools", label: "Framework Tools", icon: Wrench}
   ];
+
+  const renderTools = () => (
+    <section className="bg-white p-8 rounded-lg shadow-md border-l-4 border-indigo-500">
+      <h2 className="text-2xl font-bold mb-6 text-gray-900">Framework Tools</h2>
+      <p className="text-gray-700 mb-6">
+        Explore our interactive tools to apply this framework:
+      </p>
+      <div className="grid md:grid-cols-2 gap-6">
+        <button
+          onClick={() => setCurrentPage("exploration")}
+          className="group block p-6 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg shadow-md hover:shadow-xl transition-all hover:-translate-y-1 text-white text-left border-none cursor-pointer"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xl font-bold">
+              Emerging Technology Exploration
+            </h3>
+            <ExternalLink className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+          </div>
+          <p className="text-teal-50">
+            Explore emerging technologies via various Machine Learning Language
+            models
+          </p>
+        </button>
+        <button
+          onClick={() => setCurrentPage("assessment")}
+          className="group block p-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md hover:shadow-xl transition-all hover:-translate-y-1 text-white text-left border-none cursor-pointer"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xl font-bold">Technology Assessment</h3>
+            <ExternalLink className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+          </div>
+          <p className="text-blue-50">
+            Assess and evaluate a list of emerging technologies
+          </p>
+        </button>
+      </div>
+    </section>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -855,6 +856,7 @@ const LandingPage = ({ setCurrentPage }) => {
         {activeTab === "stage3" && renderStage3()}
         {activeTab === "stage4" && renderStage4()}
         {activeTab === "report" && renderReport()}
+        {activeTab === "tools" && renderTools()}
       </main>
 
       <footer className="bg-gradient-to-r from-gray-800 to-gray-900 text-white py-8 px-6 mt-16">
