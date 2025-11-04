@@ -255,7 +255,7 @@ const LandingPage = ({ setCurrentPage }) => {
 
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-8 rounded-lg border-l-4 border-blue-500">
         <p className="text-gray-700 text-lg">
-          Each technology is evaluated using a weighted scoring model (0–5
+          Each technology is evaluated using a weighted scoring model (0–10
           scale) for each criterion, producing a{" "}
           <strong className="text-blue-700">Tech Impact Score (TIS)</strong>.
         </p>
