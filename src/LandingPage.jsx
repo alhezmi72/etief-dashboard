@@ -770,7 +770,7 @@ const LandingPage = ({ setCurrentPage }) => {
     { id: "stage3", label: "Stage 3", icon: Map },
     { id: "stage4", label: "Stage 4", icon: Activity },
     { id: "report", label: "Risk Report", icon: PieChart },
-    { id: "tools", label: "Framework Tools", icon: Wrench}
+    { id: "tools", label: "Framework Tools", icon: Wrench },
   ];
 
   const renderTools = () => (
@@ -785,9 +785,7 @@ const LandingPage = ({ setCurrentPage }) => {
           className="group block p-6 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg shadow-md hover:shadow-xl transition-all hover:-translate-y-1 text-white text-left border-none cursor-pointer"
         >
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xl font-bold">
-              Emerging Technology Exploration
-            </h3>
+            <h3 className="text-xl font-bold">Technology Exploration</h3>
             <ExternalLink className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
           </div>
           <p className="text-teal-50">
