@@ -255,7 +255,7 @@ const TechExpDashboard = ({ setCurrentPage }) => {
         {/* Filter Section */}
         <div className="bg-white p-6 rounded-lg shadow-sm mb-6 border border-gray-200">
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <label className="font-semibold text-gray-700">
                 Data Source:
               </label>
@@ -525,7 +525,7 @@ const TechExpDashboard = ({ setCurrentPage }) => {
             </div>
 
             <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-              <div className="flex flex-wrap justify-between gap-4 text-sm">
+              <div className="flex flex-wrap justify-between gap-4 text-gray-400">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 bg-green-500 rounded"></div>
                   <span>Quick Wins (TIS ≥7, TRL ≥7)</span>
