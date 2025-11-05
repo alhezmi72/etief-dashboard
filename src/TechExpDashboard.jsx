@@ -225,8 +225,8 @@ const TechExpDashboard = ({ setCurrentPage }) => {
           <div className="flex overflow-x-auto gap-2 py-3">
             {[
               { id: "hype", label: "Hype Cycle", icon: RefreshCw },
+               { id: "table", label: "Impact Assessment", icon: FileText },
               { id: "matrix", label: "Strategic Matrix", icon: Grid },
-              { id: "table", label: "Impact Assessment", icon: FileText },
             ].map((view) => (
               <button
                 key={view.id}

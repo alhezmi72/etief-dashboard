@@ -221,13 +221,13 @@ const TechAssessment = ({ setCurrentPage }) => {
           <div className="flex overflow-x-auto gap-2 py-3">
             {[
               { id: "hype", label: "Hype Cycle", icon: RefreshCw },
-              { id: "matrix", label: "Strategic Matrix", icon: Grid },
               { id: "table", label: "Impact Assessment", icon: FileText },
               {
                 id: "comparison",
                 label: "Dataset Comparison",
                 icon: BarChart3,
               },
+              { id: "matrix", label: "Strategic Matrix", icon: Grid },
             ].map((view) => {
               const Icon = view.icon;
               return (
