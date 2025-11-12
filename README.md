@@ -3,24 +3,26 @@
 ## 🌐 Introduction
 This project provides an interactive web dashboard to **explore and assess emerging technologies** expected to shape 2025 and beyond.
 
-It is structured into two sub-projects, each developed as a **React-based** application and combined into a single containerized web solution.
+It is structured into two part, a theoretical discussion and two tools each developed as a **React-based** application and combined into a single containerized web solution.
 
 ---
+### Landing page
+The landing page describes the theoretical aspect of the framework, namely: framework objectives and exploration and assessment steps and stages. 
 
-### 🚀 technologies-exploration
-This sub-project lists **potential emerging technologies** proposed by various Large Language Models (LLMs) such as:
+### 🚀 Technologies Exploration Tool
+These lists **potential emerging technologies** proposed by various Large Language Models (LLMs) such as:
 - ChatGPT  
 - Claude.ai  
 - Google Gemini  
-- DeepSeek  
+- DeepSeek
 
-It allows users to **navigate, filter, and explore** technologies interactively.
+It allows users to **navigate, filter, and explore** technologies interactively. These lists can be extended by adding the new list as CSV file into the data folder under the public path.  
 
 ---
 
-### 🔍 technologies-assessment
-This sub-project presents the **assessment and evaluation** of a fixed set of emerging technologies, as analyzed by different LLMs.  
-It enables users to **compare insights** and view aggregated assessments across multiple AI models.
+### 🔍 Technologies Assessment Tool
+The assessment tool presents the **assessment and evaluation** of a fixed set of emerging technologies, as analyzed by different LLMs.  
+It enables users to **compare insights** and view aggregated assessments across multiple AI models. A new dataset of the emerging technologies can be added similar to the exploration dataset. The corresponding component shall be extended too. 
 
 ---
 
