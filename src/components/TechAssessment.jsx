@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   ArrowLeft,
   Download,
@@ -12,20 +12,21 @@ import {
   BarChart3,
 } from "lucide-react";
 
-// Import technology data - in production, this would come from techAssessmentData.js
-// Import all technology datasets
-import {
-  technologiesClaude,
-  technologiesGPT,
-  technologiesGemini,
-  technologiesDeepSeek,
-  dataSources,
-} from "./techAssessmentData";
+import { useCSVLoader } from "../hooks/useCSVLoader.js";
 
 // Technology Assessment Component
 const TechAssessment = ({ setCurrentPage }) => {
+  const filePaths = {
+    technologiesClaude: "/data/Assessment/Claude-AI.csv",
+    technologiesGPT: "/data/Assessment/ChatGPT.csv",
+    technologiesGemini: "/data/Assessment/Gemini.csv",
+    technologiesDeepSeek: "/data/Assessment/DeepSeek.csv",
+  };
+
+  const { data, loading, error } = useCSVLoader(filePaths);
+
   const [dataSource, setDataSource] = useState("claude");
-  const [technologies, setTechnologies] = useState(technologiesClaude);
+  const [technologies, setTechnologies] = useState([]);
   const [selectedTech, setSelectedTech] = useState(null);
   const [dragging, setDragging] = useState(null);
   const [activeView, setActiveView] = useState("hype");
@@ -39,29 +40,74 @@ const TechAssessment = ({ setCurrentPage }) => {
   const [filterCategory, setFilterCategory] = useState("all");
   const svgRef = useRef(null);
 
+  // Initialize technologies when data loads
+  useEffect(() => {
+    if (data.technologiesClaude && data.technologiesClaude.length > 0) {
+      setTechnologies(data.technologiesClaude);
+    }
+  }, [data.technologiesClaude]);
+
+  // Now safe to do conditional returns
+  if (loading) return <div>Loading technology data...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   const handleDataSourceChange = (source) => {
     setDataSource(source);
     switch (source) {
       case "claude":
-        setTechnologies(technologiesClaude);
+        setTechnologies(data.technologiesClaude || []);
         break;
       case "gpt":
-        setTechnologies(technologiesGPT);
+        setTechnologies(data.technologiesGPT || []);
         break;
       case "gemini":
-        setTechnologies(technologiesGemini);
+        setTechnologies(data.technologiesGemini || []);
         break;
       case "deepSeek":
-        setTechnologies(technologiesDeepSeek);
+        setTechnologies(data.technologiesDeepSeek || []);
         break;
       default:
-        setTechnologies(technologiesClaude);
+        setTechnologies(data.technologiesClaude || []);
     }
     setSelectedTech(null);
     setFilterCategory("all");
   };
 
   const categories = ["all", ...new Set(technologies.map((t) => t.category))];
+
+  // Data source metadata
+  const dataSources = {
+    claude: {
+      name: "Claude AI",
+      description:
+        "Curated from Gartner, WEF, McKinsey, and CB Insights 2024/2025 reports",
+      count: data.technologiesClaude.length,
+      focus: "Balanced coverage across all emerging tech domains",
+    },
+    gpt: {
+      name: "ChatGPT",
+      description:
+        "Comprehensive 30-technology dataset with expanded categories",
+      count: data.technologiesGPT.length,
+      focus:
+        "Quantum, Edge, Sustainability, AI Governance, and Bio-Digital Interfaces",
+    },
+    gemini: {
+      name: "Google Gemini",
+      description:
+        "Industry consensus with emphasis on market maturity assessment",
+      count: data.technologiesGemini.length,
+      focus: "TRL accuracy and barrier analysis with 2025 market perspective",
+    },
+    deepSeek: {
+      name: "Deep Seek AI",
+      description:
+        "Industry consensus with emphasis on market maturity assessment",
+      count: data.technologiesDeepSeek.length,
+      focus: "TRL accuracy and barrier analysis with 2025 market perspective",
+    },
+  };
+  
 
   const calculateTIS = (tech) => {
     const score =
@@ -76,10 +122,10 @@ const TechAssessment = ({ setCurrentPage }) => {
   const calculateTISForAllDatasets = (techName) => {
     const results = {};
     const datasets = {
-      claude: technologiesClaude,
-      gpt: technologiesGPT,
-      gemini: technologiesGemini,
-      deepSeek: technologiesDeepSeek,
+      claude: data.technologiesClaude,
+      gpt: data.technologiesGPT,
+      gemini: data.technologiesGemini,
+      deepSeek: data.technologiesDeepSeek,
     };
 
     Object.entries(datasets).forEach(([key, dataset]) => {
@@ -99,10 +145,10 @@ const TechAssessment = ({ setCurrentPage }) => {
   const getAllTechnologyNames = () => {
     const allNames = new Set();
     [
-      technologiesClaude,
-      technologiesGPT,
-      technologiesGemini,
-      technologiesDeepSeek,
+      data.technologiesClaude,
+      data.technologiesGPT,
+      data.technologiesGemini,
+      data.technologiesDeepSeek,
     ].forEach((dataset) => {
       dataset.forEach((tech) => allNames.add(tech.name));
     });

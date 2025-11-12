@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Download,
   Settings,
@@ -11,19 +11,22 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
-// Import all technology datasets
-import {
-  technologiesClaude,
-  technologiesGPT,
-  technologiesGemini,
-  technologiesDeepSeek,
-  smartCityRoboticTechnologies,
-  dataSources,
-} from "./techExplorationData";
+import { useCSVLoader } from "../hooks/useCSVLoader.js";
 
-const TechExpDashboard = ({ setCurrentPage }) => {
+const TechExploration = ({ setCurrentPage }) => {
+  const filePaths = {
+    technologiesClaude: "/data/Exploration/Claude-AI.csv",
+    technologiesGPT: "/data/Exploration/ChatGPT.csv",
+    technologiesGemini: "/data/Exploration/Gemini.csv",
+    technologiesDeepSeek: "/data/Exploration/DeepSeek.csv",
+    technologiesSmartCity: "/data/Exploration/SmartCity.csv",
+    technologiesRobotic: "/data/Exploration/Robotic.csv",
+  };
+
+  const { data, loading, error } = useCSVLoader(filePaths);
+
   const [dataSource, setDataSource] = useState("claude");
-  const [technologies, setTechnologies] = useState(technologiesClaude);
+  const [technologies, setTechnologies] = useState([]);
   const [selectedTech, setSelectedTech] = useState(null);
   const [dragging, setDragging] = useState(null);
   const [activeView, setActiveView] = useState("hype");
@@ -34,30 +37,45 @@ const TechExpDashboard = ({ setCurrentPage }) => {
     barriers: -0.1,
     sustainability: 0.1,
   });
+
   const [filterCategory, setFilterCategory] = useState("all");
   const svgRef = useRef(null);
+
+  // Initialize technologies when data loads
+  useEffect(() => {
+    if (data.technologiesClaude && data.technologiesClaude.length > 0) {
+      setTechnologies(data.technologiesClaude);
+    }
+  }, [data.technologiesClaude]);
+
+  // Now safe to do conditional returns
+  if (loading) return <div>Loading technology data...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   // Handle data source change
   const handleDataSourceChange = (source) => {
     setDataSource(source);
     switch (source) {
       case "claude":
-        setTechnologies(technologiesClaude);
+        setTechnologies(data.technologiesClaude || []);
         break;
       case "gpt":
-        setTechnologies(technologiesGPT);
+        setTechnologies(data.technologiesGPT || []);
         break;
       case "gemini":
-        setTechnologies(technologiesGemini);
+        setTechnologies(data.technologiesGemini || []);
         break;
       case "deepSeek":
-        setTechnologies(technologiesDeepSeek);
+        setTechnologies(data.technologiesDeepSeek || []);
         break;
-      case "smartCityRobotic":
-        setTechnologies(smartCityRoboticTechnologies);
+      case "smartCity":
+        setTechnologies(data.technologiesSmartCity || []);
+        break;
+        case "robotic":
+        setTechnologies(data.technologiesRobotic || []);
         break;
       default:
-        setTechnologies(technologiesClaude);
+        setTechnologies(data.technologiesClaude || []);
     }
     setSelectedTech(null);
     setFilterCategory("all");
@@ -72,7 +90,7 @@ const TechExpDashboard = ({ setCurrentPage }) => {
       tech.strategicFit * weights.strategicFit +
       (10 - tech.barriers) * Math.abs(weights.barriers) +
       (10 - tech.sustainability) * weights.sustainability;
-      
+
     return Math.max(0, Math.min(10, score)).toFixed(2);
   };
 
@@ -225,7 +243,7 @@ const TechExpDashboard = ({ setCurrentPage }) => {
           <div className="flex overflow-x-auto gap-2 py-3">
             {[
               { id: "hype", label: "Hype Cycle", icon: RefreshCw },
-               { id: "table", label: "Impact Assessment", icon: FileText },
+              { id: "table", label: "Impact Assessment", icon: FileText },
               { id: "matrix", label: "Strategic Matrix", icon: Grid },
             ].map((view) => (
               <button
@@ -268,9 +286,8 @@ const TechExpDashboard = ({ setCurrentPage }) => {
                 <option value="gpt">GPT Dataset</option>
                 <option value="gemini">Gemini Dataset</option>
                 <option value="deepSeek">DeepSeek Dataset</option>
-                <option value="smartCityRobotic">
-                  Smart City & Robotics Dataset
-                </option>
+                <option value="smartCity">Smart City Dataset</option>
+                <option value="robotic">Robotic Dataset</option>
               </select>
             </div>
 
@@ -788,4 +805,4 @@ const TechExpDashboard = ({ setCurrentPage }) => {
   );
 };
 
-export default TechExpDashboard;
+export default TechExploration;
