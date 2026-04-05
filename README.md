@@ -79,6 +79,34 @@ npm run dev
 
 4. Open the provided local URL (usually `http://localhost:5173`) in your browser.
 
+## Run the project on Github Page 
+You can deploy the web page on GitHub infrastructure and let GitHub run it as a Github page following `https://docs.github.com/en/pages`. 
+
+1. Ensure that the path `./dist` is defined in the `.github/workflows/static.yml` file under the upload-pages-artifact step. Update the path to point to this directory:
+
+```bash
+- name: Upload artifact
+  uses: actions/upload-pages-artifact@v3
+  with:
+    # Point this to your public directory
+    path: ./dist
+``` 
+
+Run the following command: 
+
+2. Install dependencies:
+
+```bash
+npm install
+```  
+3. Build the project:
+
+```bash
+npm run build
+```
+4. Commit the project 
+5. Open the following URL `https://alhezmi72.github.io/etief-dashboard/`, where `alhezmi72` is the name of the repository owner and the `etief-dashboard` is the project name.
+
 ## 🏗️ Project Structure
 
 ```lua
@@ -94,29 +122,3 @@ etief-dashboard/
 - **React 18 + Vite** — for front-end rendering and fast builds
 - **Python HTTP Server** — for lightweight static hosting
 - **Docker** — for environment consistency and portability
-
-## Deploying on Github 
-You can deploy the web page on GitHub infrastructure and let GitHub run it as a Github page following `https://docs.github.com/en/pages`. The page can be found in `https://alhezmi72.github.io/etief-dashboard/`
-
-Ensure that the path `./dist` is defined in the `.github/workflows/static.yml` file under the upload-pages-artifact step. Update the path to point to this directory:
-
-```bash
-- name: Upload artifact
-  uses: actions/upload-pages-artifact@v3
-  with:
-    # Point this to your public directory
-    path: ./dist
-``` 
-
-Before commit the page, you should run the following command: 
-
-1. Install dependencies:
-
-```bash
-npm install
-```  
-2. Build the project:
-
-```bash
-npm run build
-```
