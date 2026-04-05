@@ -79,7 +79,7 @@ npm run dev
 
 4. Open the provided local URL (usually `http://localhost:5173`) in your browser.
 
-## Run the project on Github Page 
+## :github Run the project on Github Page 
 You can deploy the web page on GitHub infrastructure and let GitHub run it as a Github page following `https://docs.github.com/en/pages`. 
 
 1. Ensure that the path `./dist` is defined in the `.github/workflows/static.yml` file under the upload-pages-artifact step. Update the path to point to this directory:
