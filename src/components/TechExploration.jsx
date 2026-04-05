@@ -15,12 +15,12 @@ import { useCSVLoader } from "../hooks/useCSVLoader.js";
 
 const TechExploration = ({ setCurrentPage }) => {
   const filePaths = {
-    technologiesClaude: "/data/Exploration/Claude-AI.csv",
-    technologiesGPT: "/data/Exploration/ChatGPT.csv",
-    technologiesGemini: "/data/Exploration/Gemini.csv",
-    technologiesDeepSeek: "/data/Exploration/DeepSeek.csv",
-    technologiesSmartCity: "/data/Exploration/SmartCity.csv",
-    technologiesRobotic: "/data/Exploration/Robotic.csv",
+    technologiesClaude: "./data/Exploration/Claude-AI.csv",
+    technologiesGPT: "./data/Exploration/ChatGPT.csv",
+    technologiesGemini: "./data/Exploration/Gemini.csv",
+    technologiesDeepSeek: "./data/Exploration/DeepSeek.csv",
+    technologiesSmartCity: "./data/Exploration/SmartCity.csv",
+    technologiesRobotic: "./data/Exploration/Robotic.csv",
   };
 
   const { data, loading, error } = useCSVLoader(filePaths);

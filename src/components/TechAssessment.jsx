@@ -17,10 +17,10 @@ import { useCSVLoader } from "../hooks/useCSVLoader.js";
 // Technology Assessment Component
 const TechAssessment = ({ setCurrentPage }) => {
   const filePaths = {
-    technologiesClaude: "/data/Assessment/Claude-AI.csv",
-    technologiesGPT: "/data/Assessment/ChatGPT.csv",
-    technologiesGemini: "/data/Assessment/Gemini.csv",
-    technologiesDeepSeek: "/data/Assessment/DeepSeek.csv",
+    technologiesClaude: "./data/Assessment/Claude-AI.csv",
+    technologiesGPT: "./data/Assessment/ChatGPT.csv",
+    technologiesGemini: "./data/Assessment/Gemini.csv",
+    technologiesDeepSeek: "./data/Assessment/DeepSeek.csv",
   };
 
   const { data, loading, error } = useCSVLoader(filePaths);
