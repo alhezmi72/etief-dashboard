@@ -97,3 +97,26 @@ etief-dashboard/
 
 ## Deploying on Github 
 You can deploy the web page on GitHub infrastructure and let GitHub run it as a Github page following `https://docs.github.com/en/pages`. The page can be found in `https://alhezmi72.github.io/etief-dashboard/`
+
+Ensure that the path `./dist` is defined in the `.github/workflows/static.yml` file under the upload-pages-artifact step. Update the path to point to this directory:
+
+```bash
+- name: Upload artifact
+  uses: actions/upload-pages-artifact@v3
+  with:
+    # Point this to your public directory
+    path: ./dist
+``` 
+
+Before commit the page, you should run the following command: 
+
+1. Install dependencies:
+
+```bash
+npm install
+```  
+2. Build the project:
+
+```bash
+npm run build
+```
