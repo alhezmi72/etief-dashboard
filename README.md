@@ -94,3 +94,6 @@ etief-dashboard/
 - **React 18 + Vite** — for front-end rendering and fast builds
 - **Python HTTP Server** — for lightweight static hosting
 - **Docker** — for environment consistency and portability
+
+## Deploying on Github 
+You can deploy the web page on GitHub infrastructure and let GitHub run it as a Github page following `https://docs.github.com/en/pages`. The page can be found in `https://alhezmi72.github.io/etief-dashboard/`
