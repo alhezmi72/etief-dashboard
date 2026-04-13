@@ -273,7 +273,7 @@ const TechExploration = ({ setCurrentPage }) => {
               <select
                 value={dataSource}
                 onChange={(e) => handleDataSourceChange(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                className="px-4 py-2 bg-gray-50 border-2 border-gray-200 rounded-lg text-gray-700 font-medium focus:border-teal-500 focus:outline-none"
               >
                 {sourceKeys.map((key) => (
                   <option key={key} value={key}>
@@ -321,7 +321,7 @@ const TechExploration = ({ setCurrentPage }) => {
                   if (e.target.value !== "all") setCategoryLocked(true);
                   else setCategoryLocked(false);
                 }}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                className="px-4 py-2 bg-gray-50 border-2 border-gray-200 rounded-lg text-gray-700 font-medium focus:border-teal-500 focus:outline-none"
               >
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
