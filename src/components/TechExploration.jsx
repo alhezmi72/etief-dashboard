@@ -11,21 +11,20 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
-import { useCSVLoader } from "../hooks/useCSVLoader.js";
+import useCSVExplorationDatasets from "./useCSVExplorationDatasets";
 
 const TechExploration = ({ setCurrentPage }) => {
-  const filePaths = {
-    technologiesClaude: "./data/Exploration/Claude-AI.csv",
-    technologiesGPT: "./data/Exploration/ChatGPT.csv",
-    technologiesGemini: "./data/Exploration/Gemini.csv",
-    technologiesDeepSeek: "./data/Exploration/DeepSeek.csv",
-    technologiesSmartCity: "./data/Exploration/SmartCity.csv",
-    technologiesRobotic: "./data/Exploration/Robotic.csv",
-  };
+  const { datasetsMap, sourceKeys, createdDate, loading, error } = useCSVExplorationDatasets(
+    "./data/Exploration",
+    [
+      "Claude.csv",
+      "ChatGPT.csv",
+      "Gemini.csv",
+      "DeepSeek.csv",
+    ]
+  );
 
-  const { data, loading, error } = useCSVLoader(filePaths);
-
-  const [dataSource, setDataSource] = useState("claude");
+  const [dataSource, setDataSource] = useState("");
   const [technologies, setTechnologies] = useState([]);
   const [selectedTech, setSelectedTech] = useState(null);
   const [dragging, setDragging] = useState(null);
@@ -39,14 +38,16 @@ const TechExploration = ({ setCurrentPage }) => {
   });
 
   const [filterCategory, setFilterCategory] = useState("all");
+  const [categoryLocked, setCategoryLocked] = useState(false);
   const svgRef = useRef(null);
 
-  // Initialize technologies when data loads
+  // Initialize dataSource and technologies once datasets are loaded
   useEffect(() => {
-    if (data.technologiesClaude && data.technologiesClaude.length > 0) {
-      setTechnologies(data.technologiesClaude);
-    }
-  }, [data.technologiesClaude]);
+    if (sourceKeys.length === 0) return;
+    const defaultKey = sourceKeys.includes("Claude-AI") ? "Claude-AI" : sourceKeys[0];
+    setDataSource(defaultKey);
+    setTechnologies(datasetsMap[defaultKey] || []);
+  }, [sourceKeys, datasetsMap]);
 
   // Now safe to do conditional returns
   if (loading) return <div>Loading technology data...</div>;
@@ -55,33 +56,25 @@ const TechExploration = ({ setCurrentPage }) => {
   // Handle data source change
   const handleDataSourceChange = (source) => {
     setDataSource(source);
-    switch (source) {
-      case "claude":
-        setTechnologies(data.technologiesClaude || []);
-        break;
-      case "gpt":
-        setTechnologies(data.technologiesGPT || []);
-        break;
-      case "gemini":
-        setTechnologies(data.technologiesGemini || []);
-        break;
-      case "deepSeek":
-        setTechnologies(data.technologiesDeepSeek || []);
-        break;
-      case "smartCity":
-        setTechnologies(data.technologiesSmartCity || []);
-        break;
-        case "robotic":
-        setTechnologies(data.technologiesRobotic || []);
-        break;
-      default:
-        setTechnologies(data.technologiesClaude || []);
-    }
+    setTechnologies(datasetsMap[source] || []);
     setSelectedTech(null);
-    setFilterCategory("all");
+    // Only reset the category filter when it is not locked by the user.
+    if (!categoryLocked) setFilterCategory("all");
   };
 
-  const categories = ["all", ...new Set(technologies.map((t) => t.category))];
+  // Derive categories from ALL datasets so the list is stable across source
+  // switches and the fixed category option always shows a complete menu.
+  const categories = [
+    "all",
+    ...Array.from(
+      new Set(
+        Object.values(datasetsMap)
+          .flat()
+          .map((t) => t.category)
+          .filter(Boolean)
+      )
+    ).sort(),
+  ];
 
   const calculateTIS = (tech) => {
     const score =
@@ -282,22 +275,52 @@ const TechExploration = ({ setCurrentPage }) => {
                 onChange={(e) => handleDataSourceChange(e.target.value)}
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               >
-                <option value="claude">Claude Dataset</option>
-                <option value="gpt">GPT Dataset</option>
-                <option value="gemini">Gemini Dataset</option>
-                <option value="deepSeek">DeepSeek Dataset</option>
-                <option value="smartCity">Smart City Dataset</option>
-                <option value="robotic">Robotic Dataset</option>
+                {sourceKeys.map((key) => (
+                  <option key={key} value={key}>
+                    {key} Dataset
+                  </option>
+                ))}
               </select>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 flex-wrap">
               <label className="font-semibold text-gray-700">
                 Filter Category:
               </label>
+              {/* Radio buttons: All (default) vs Fixed (persist across source switches) */}
+              <div className="flex items-center gap-3 text-sm">
+                <label className="flex items-center gap-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="categoryMode"
+                    checked={!categoryLocked}
+                    onChange={() => {
+                      setCategoryLocked(false);
+                      setFilterCategory("all");
+                    }}
+                    className="accent-teal-600"
+                  />
+                  <span className="text-gray-600">All</span>
+                </label>
+                <label className="flex items-center gap-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="categoryMode"
+                    checked={categoryLocked}
+                    onChange={() => setCategoryLocked(true)}
+                    className="accent-teal-600"
+                  />
+                  <span className="text-gray-600">Fixed</span>
+                </label>
+              </div>
               <select
                 value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value)}
+                onChange={(e) => {
+                  setFilterCategory(e.target.value);
+                  // Selecting a specific category implicitly enables lock mode.
+                  if (e.target.value !== "all") setCategoryLocked(true);
+                  else setCategoryLocked(false);
+                }}
                 className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               >
                 {categories.map((cat) => (
@@ -306,11 +329,16 @@ const TechExploration = ({ setCurrentPage }) => {
                   </option>
                 ))}
               </select>
+              {categoryLocked && filterCategory !== "all" && (
+                <span className="text-xs font-medium px-2 py-1 bg-teal-100 text-teal-700 rounded-full border border-teal-300">
+                  📌 Pinned
+                </span>
+              )}
             </div>
 
             <span className="text-gray-500 text-sm ml-auto">
               Showing {filteredTech.length} of {technologies.length}{" "}
-              technologies
+              technologies{createdDate ? `, created on ${createdDate}` : ""}
             </span>
 
             <div className="flex gap-3">

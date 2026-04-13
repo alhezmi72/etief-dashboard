@@ -12,24 +12,26 @@ import {
   BarChart3,
 } from "lucide-react";
 
-import { useCSVLoader } from "../hooks/useCSVLoader.js";
+import useCSVExplorationDatasets from "./useCSVExplorationDatasets";
 
 // Technology Assessment Component
 const TechAssessment = ({ setCurrentPage }) => {
-  const filePaths = {
-    technologiesClaude: "./data/Assessment/Claude-AI.csv",
-    technologiesGPT: "./data/Assessment/ChatGPT.csv",
-    technologiesGemini: "./data/Assessment/Gemini.csv",
-    technologiesDeepSeek: "./data/Assessment/DeepSeek.csv",
-  };
+  const { datasetsMap, sourceKeys, createdDate, loading, error } = useCSVExplorationDatasets(
+    "./data/Assessment",
+    [
+      "Claude-AI.csv",
+      "ChatGPT.csv",
+      "Gemini.csv",
+      "DeepSeek.csv",
+    ]
+  );
 
-  const { data, loading, error } = useCSVLoader(filePaths);
-
-  const [dataSource, setDataSource] = useState("claude");
+  const [dataSource, setDataSource] = useState("");
   const [technologies, setTechnologies] = useState([]);
   const [selectedTech, setSelectedTech] = useState(null);
   const [dragging, setDragging] = useState(null);
   const [activeView, setActiveView] = useState("hype");
+
   const [weights, setWeights] = useState({
     trl: 0.3,
     impact: 0.3,
@@ -40,12 +42,13 @@ const TechAssessment = ({ setCurrentPage }) => {
   const [filterCategory, setFilterCategory] = useState("all");
   const svgRef = useRef(null);
 
-  // Initialize technologies when data loads
+  // Initialize dataSource and technologies once datasets are loaded
   useEffect(() => {
-    if (data.technologiesClaude && data.technologiesClaude.length > 0) {
-      setTechnologies(data.technologiesClaude);
-    }
-  }, [data.technologiesClaude]);
+    if (sourceKeys.length === 0) return;
+    const defaultKey = sourceKeys.includes("Claude-AI") ? "Claude-AI" : sourceKeys[0];
+    setDataSource(defaultKey);
+    setTechnologies(datasetsMap[defaultKey] || []);
+  }, [sourceKeys, datasetsMap]);
 
   // Now safe to do conditional returns
   if (loading) return <div>Loading technology data...</div>;
@@ -53,61 +56,46 @@ const TechAssessment = ({ setCurrentPage }) => {
 
   const handleDataSourceChange = (source) => {
     setDataSource(source);
-    switch (source) {
-      case "claude":
-        setTechnologies(data.technologiesClaude || []);
-        break;
-      case "gpt":
-        setTechnologies(data.technologiesGPT || []);
-        break;
-      case "gemini":
-        setTechnologies(data.technologiesGemini || []);
-        break;
-      case "deepSeek":
-        setTechnologies(data.technologiesDeepSeek || []);
-        break;
-      default:
-        setTechnologies(data.technologiesClaude || []);
-    }
+    setTechnologies(datasetsMap[source] || []);
     setSelectedTech(null);
-    setFilterCategory("all");
+    // filterCategory is intentionally preserved so the user's chosen
+    // category stays active when switching between data sources.
   };
 
-  const categories = ["all", ...new Set(technologies.map((t) => t.category))];
+  // Derive categories from ALL datasets so the list stays stable and the
+  // selected category persists when the user switches data sources.
+  const categories = [
+    "all",
+    ...Array.from(
+      new Set(
+        Object.values(datasetsMap)
+          .flat()
+          .map((t) => t.category)
+          .filter(Boolean)
+      )
+    ).sort(),
+  ];
 
-  // Data source metadata
-  const dataSources = {
-    claude: {
-      name: "Claude AI",
-      description:
-        "Curated from Gartner, WEF, McKinsey, and CB Insights 2024/2025 reports",
-      count: data.technologiesClaude.length,
-      focus: "Balanced coverage across all emerging tech domains",
-    },
-    gpt: {
-      name: "ChatGPT",
-      description:
-        "Comprehensive 30-technology dataset with expanded categories",
-      count: data.technologiesGPT.length,
-      focus:
-        "Quantum, Edge, Sustainability, AI Governance, and Bio-Digital Interfaces",
-    },
-    gemini: {
-      name: "Google Gemini",
-      description:
-        "Industry consensus with emphasis on market maturity assessment",
-      count: data.technologiesGemini.length,
-      focus: "TRL accuracy and barrier analysis with 2025 market perspective",
-    },
-    deepSeek: {
-      name: "Deep Seek AI",
-      description:
-        "Industry consensus with emphasis on market maturity assessment",
-      count: data.technologiesDeepSeek.length,
-      focus: "TRL accuracy and barrier analysis with 2025 market perspective",
-    },
-  };
-  
+  // Build dataSources metadata dynamically from fetched sourceKeys
+  const dataSources = Object.fromEntries(
+    sourceKeys.map((key) => [
+      key,
+      {
+        name: key,
+        count: (datasetsMap[key] || []).length,
+      },
+    ])
+  );
+
+  // Palette cycles for the comparison badges
+  const badgeColors = [
+    "#8B5CF6",
+    "#10B981",
+    "#F59E0B",
+    "#EF4444",
+    "#3B82F6",
+    "#EC4899",
+  ];
 
   const calculateTIS = (tech) => {
     const score =
@@ -121,14 +109,7 @@ const TechAssessment = ({ setCurrentPage }) => {
 
   const calculateTISForAllDatasets = (techName) => {
     const results = {};
-    const datasets = {
-      claude: data.technologiesClaude,
-      gpt: data.technologiesGPT,
-      gemini: data.technologiesGemini,
-      deepSeek: data.technologiesDeepSeek,
-    };
-
-    Object.entries(datasets).forEach(([key, dataset]) => {
+    Object.entries(datasetsMap).forEach(([key, dataset]) => {
       const tech = dataset.find((t) => t.name === techName);
       if (tech) {
         results[key] = {
@@ -138,22 +119,23 @@ const TechAssessment = ({ setCurrentPage }) => {
         };
       }
     });
-
     return results;
   };
 
   const getAllTechnologyNames = () => {
     const allNames = new Set();
-    [
-      data.technologiesClaude,
-      data.technologiesGPT,
-      data.technologiesGemini,
-      data.technologiesDeepSeek,
-    ].forEach((dataset) => {
-      dataset.forEach((tech) => allNames.add(tech.name));
+    Object.values(datasetsMap).forEach((dataset) => {
+      dataset.forEach((tech) => {
+        // When a category is selected, only include technologies that belong
+        // to that category in at least one dataset.
+        if (filterCategory === "all" || tech.category === filterCategory) {
+          allNames.add(tech.name);
+        }
+      });
     });
     return Array.from(allNames).sort();
   };
+
   const phases = [
     { name: "Innovation Trigger", x: 0, width: 20 },
     { name: "Peak of Inflated Expectations", x: 20, width: 15 },
@@ -314,10 +296,11 @@ const TechAssessment = ({ setCurrentPage }) => {
                 onChange={(e) => handleDataSourceChange(e.target.value)}
                 className="px-4 py-2 bg-gray-50 border-2 border-gray-200 rounded-lg text-gray-700 font-medium focus:border-teal-500 focus:outline-none"
               >
-                <option value="claude">Claude Dataset</option>
-                <option value="gpt">GPT Dataset</option>
-                <option value="gemini">Gemini Dataset</option>
-                <option value="deepSeek">DeepSeek Dataset</option>
+                {sourceKeys.map((key) => (
+                  <option key={key} value={key}>
+                    {key} Dataset
+                  </option>
+                ))}
               </select>
             </div>
             <div className="flex items-center gap-3">
@@ -336,7 +319,7 @@ const TechAssessment = ({ setCurrentPage }) => {
             </div>
             <span className="ml-auto text-sm text-gray-500 font-medium">
               Showing {filteredTech.length} of {technologies.length}{" "}
-              technologies
+              technologies{createdDate ? `, created on ${createdDate}` : ""}
             </span>
             <div className="flex gap-3 mt-6">
               <button
@@ -743,24 +726,16 @@ const TechAssessment = ({ setCurrentPage }) => {
             </div>
 
             <div className="flex gap-4 mb-6 flex-wrap">
-              {Object.entries(dataSources).map(([key, source]) => {
-                const colors = {
-                  claude: "#8B5CF6",
-                  gpt: "#10B981",
-                  gemini: "#F59E0B",
-                  deepSeek: "#EF4444",
-                };
-                return (
-                  <div
-                    key={key}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm text-white"
-                    style={{ backgroundColor: colors[key] }}
-                  >
-                    <Database size={16} />
-                    {source.name} ({source.count})
-                  </div>
-                );
-              })}
+              {sourceKeys.map((key, idx) => (
+                <div
+                  key={key}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm text-white"
+                  style={{ backgroundColor: badgeColors[idx % badgeColors.length] }}
+                >
+                  <Database size={16} />
+                  {key} ({(datasetsMap[key] || []).length})
+                </div>
+              ))}
             </div>
 
             <div className="overflow-x-auto">
@@ -769,12 +744,13 @@ const TechAssessment = ({ setCurrentPage }) => {
                   <tr>
                     <th className="p-3 text-left font-bold">Technology</th>
                     <th className="p-3 text-left font-bold">Category</th>
-                    <th className="p-3 text-center font-bold">Claude AI</th>
-                    <th className="p-3 text-center font-bold">ChatGPT</th>
-                    <th className="p-3 text-center font-bold">Gemini</th>
-                    <th className="p-3 text-center font-bold">DeepSeek</th>
+                    {sourceKeys.map((key) => (
+                      <th key={key} className="p-3 text-center font-bold">
+                        {key}
+                      </th>
+                    ))}
                     <th className="p-3 text-center font-bold">Avg TIS</th>
-                    <th className="p-3 text-center font-bold">Consistency</th>
+                    <th className="p3 text-center font-bold">Consistency</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -813,11 +789,10 @@ const TechAssessment = ({ setCurrentPage }) => {
                         </td>
                         <td className="p-3">
                           <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
-                            {results[Object.keys(results)[0]]?.category ||
-                              "N/A"}
+                            {results[Object.keys(results)[0]]?.category || "N/A"}
                           </span>
                         </td>
-                        {Object.entries(dataSources).map(([key]) => {
+                        {sourceKeys.map((key) => {
                           const result = results[key];
                           if (!result) {
                             return (
@@ -928,7 +903,5 @@ const TechAssessment = ({ setCurrentPage }) => {
     </div>
   );
 };
-
-// Landing Page Component (unchanged from previous version)
 
 export default TechAssessment;
