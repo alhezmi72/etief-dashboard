@@ -3,7 +3,7 @@ import { useCSVLoader } from '../hooks/useCSVLoader.js';
 
 const TechnologyDataComponent = () => {
   const filePaths = {
-    technologiesClaude: '/data/Claude-AI.csv',
+    technologiesClaude: '/data/ClaudeAI.csv',
     technologiesGPT: '/data/ChatGPT.csv',
     technologiesGemini: '/data/Gemini.csv',
     technologiesDeepSeek: '/data/DeepSeek.csv'

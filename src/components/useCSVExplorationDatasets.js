@@ -8,12 +8,12 @@ import { useState, useEffect } from "react";
  * @param {string} directoryPath - Relative path to the CSV directory,
  *                                 e.g. "./data/Exploration".
  * @param {string[]} fileNames   - Explicit list of CSV file names to load,
- *                                 e.g. ["Claude-AI.csv", "ChatGPT.csv"].
+ *                                 e.g. ["ClaudeAI.csv", "ChatGPT.csv"].
  *                                 The bare file stem (without extension) is
  *                                 used as the dataset key.
  *
  * Returns:
- *   datasetsMap  – { [key: string]: any[] }  e.g. { "Claude-AI": [...] }
+ *   datasetsMap  – { [key: string]: any[] }  e.g. { "ClaudeAI": [...] }
  *   sourceKeys   – string[]  ordered list of keys derived from fileNames
  *   createdDate  – null  (not available from local CSV files)
  *   loading      – boolean

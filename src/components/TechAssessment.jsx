@@ -16,15 +16,13 @@ import useCSVExplorationDatasets from "./useCSVExplorationDatasets";
 
 // Technology Assessment Component
 const TechAssessment = ({ setCurrentPage }) => {
-  const { datasetsMap, sourceKeys, createdDate, loading, error } = useCSVExplorationDatasets(
-    "./data/Assessment",
-    [
-      "Claude-AI.csv",
+  const { datasetsMap, sourceKeys, createdDate, loading, error } =
+    useCSVExplorationDatasets("./data/Assessment", [
+      "ClaudeAI.csv",
       "ChatGPT.csv",
       "Gemini.csv",
       "DeepSeek.csv",
-    ]
-  );
+    ]);
 
   const [dataSource, setDataSource] = useState("");
   const [technologies, setTechnologies] = useState([]);
@@ -45,7 +43,9 @@ const TechAssessment = ({ setCurrentPage }) => {
   // Initialize dataSource and technologies once datasets are loaded
   useEffect(() => {
     if (sourceKeys.length === 0) return;
-    const defaultKey = sourceKeys.includes("Claude-AI") ? "Claude-AI" : sourceKeys[0];
+    const defaultKey = sourceKeys.includes("ClaudeAI")
+      ? "ClaudeAI"
+      : sourceKeys[0];
     setDataSource(defaultKey);
     setTechnologies(datasetsMap[defaultKey] || []);
   }, [sourceKeys, datasetsMap]);
@@ -71,8 +71,8 @@ const TechAssessment = ({ setCurrentPage }) => {
         Object.values(datasetsMap)
           .flat()
           .map((t) => t.category)
-          .filter(Boolean)
-      )
+          .filter(Boolean),
+      ),
     ).sort(),
   ];
 
@@ -84,7 +84,7 @@ const TechAssessment = ({ setCurrentPage }) => {
         name: key,
         count: (datasetsMap[key] || []).length,
       },
-    ])
+    ]),
   );
 
   // Palette cycles for the comparison badges
@@ -176,8 +176,8 @@ const TechAssessment = ({ setCurrentPage }) => {
                 x: Math.max(0, Math.min(100, x)),
                 y: Math.max(0, Math.min(100, y)),
               }
-            : t
-        )
+            : t,
+        ),
       );
     }
   };
@@ -242,6 +242,18 @@ const TechAssessment = ({ setCurrentPage }) => {
             </div>
           </div>
         </div>
+        <div className="w-px h-4 bg-[#c7c4d8]/30 my-auto" />
+        <div className="max-w-7xl mx-auto mt-6">
+          <button
+            onClick={() => setCurrentPage("landing")}
+            className="flex items-center gap-2 px-6 py-3 bg-gray/20 hover:bg-gray/50 rounded-lg font-semibold transition-all backdrop-blur-sm text-white"
+            style={{
+              background: "linear-gradient(135deg, #4839cc 0%, #4f46e5 100%)",
+            }}
+          >
+            <ArrowLeft size={20} /> Back to Home
+          </button>
+        </div>
       </header>
 
       <nav className="bg-white shadow-md sticky top-0 z-50">
@@ -273,13 +285,6 @@ const TechAssessment = ({ setCurrentPage }) => {
                 </button>
               );
             })}
-
-            <button
-              onClick={() => setCurrentPage("landing")}
-              className="flex items-center gap-2 px-6 py-3 bg-gray/20 hover:bg-gray/50 rounded-lg font-semibold transition-all backdrop-blur-sm text-green-800"
-            >
-              <ArrowLeft size={20} /> Back to Home
-            </button>
           </div>
         </div>
       </nav>
@@ -287,28 +292,34 @@ const TechAssessment = ({ setCurrentPage }) => {
       <main className="max-w-7xl mx-auto px-6 py-12">
         <div className="mb-8 p-6 bg-white rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center gap-6 flex-wrap">
-            <div className="flex items-center gap-3">
-              <label className="font-semibold text-gray-700">
+            <div className="flex bg-gray-50 rounded-full p-1 border border-[#c7c4d8]/15 gap-1">
+              <label className="bg-transparent border-none text-s font-label text-slate-700 py-1.5 pl-3 pr-8 focus:ring-0">
                 Data Source:
               </label>
               <select
                 value={dataSource}
                 onChange={(e) => handleDataSourceChange(e.target.value)}
-                className="px-4 py-2 bg-gray-50 border-2 border-gray-200 rounded-lg text-gray-700 font-medium focus:border-teal-500 focus:outline-none"
+                className="bg-transparent border-none text-s text-slate-700 py-1.5 pl-3 pr-8 focus:ring-0 outline-none"
+                style={{ fontFamily: "Manrope, sans-serif" }}
               >
                 {sourceKeys.map((key) => (
                   <option key={key} value={key}>
-                    {key} Dataset
+                    {key}
                   </option>
                 ))}
               </select>
-            </div>
-            <div className="flex items-center gap-3">
-              <label className="font-semibold text-gray-700">Category:</label>
+
+              <div className="w-px h-4 bg-[#c7c4d8]/30 my-auto" />
+
+              <label className="bg-transparent border-none text-s font-label text-slate-700 py-1.5 pl-3 pr-8 focus:ring-0">
+                Category:
+              </label>
+
               <select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
-                className="px-4 py-2 bg-gray-50 border-2 border-gray-200 rounded-lg text-gray-700 font-medium focus:border-teal-500 focus:outline-none"
+                className="bg-transparent border-none text-s text-slate-700 py-1.5 pl-2 pr-6 focus:ring-0 outline-none"
+                style={{ fontFamily: "Manrope, sans-serif" }}
               >
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
@@ -321,7 +332,8 @@ const TechAssessment = ({ setCurrentPage }) => {
               Showing {filteredTech.length} of {technologies.length}{" "}
               technologies{createdDate ? `, created on ${createdDate}` : ""}
             </span>
-            <div className="flex gap-3 mt-6">
+
+            <div className="flex gap-3 ">
               <button
                 onClick={exportToCSV}
                 className="flex items-center gap-3 px-6 py-3 bg-white/20 hover:bg-white/30 rounded-lg font-semibold transition-all"
@@ -502,7 +514,7 @@ const TechAssessment = ({ setCurrentPage }) => {
                 },
               ].map((quadrant, idx) => {
                 const techsInQuadrant = filteredTech.filter(
-                  (t) => getMatrixQuadrant(t) === quadrant.title
+                  (t) => getMatrixQuadrant(t) === quadrant.title,
                 );
                 return (
                   <div
@@ -571,8 +583,8 @@ const TechAssessment = ({ setCurrentPage }) => {
                           key === "sustainability"
                             ? "0.3"
                             : key === "barriers"
-                            ? "0"
-                            : "1"
+                              ? "0"
+                              : "1"
                         }
                         step="0.05"
                         value={value}
@@ -611,7 +623,7 @@ const TechAssessment = ({ setCurrentPage }) => {
                     .sort(
                       (a, b) =>
                         parseFloat(calculateTIS(b)) -
-                        parseFloat(calculateTIS(a))
+                        parseFloat(calculateTIS(a)),
                     )
                     .map((tech, idx) => {
                       const tis = parseFloat(calculateTIS(tech));
@@ -649,8 +661,8 @@ const TechAssessment = ({ setCurrentPage }) => {
                                 tis >= 8
                                   ? "bg-teal-500 text-white"
                                   : tis >= 6
-                                  ? "bg-blue-500 text-white"
-                                  : "bg-indigo-500 text-white"
+                                    ? "bg-blue-500 text-white"
+                                    : "bg-indigo-500 text-white"
                               }`}
                             >
                               {tis}
@@ -703,8 +715,8 @@ const TechAssessment = ({ setCurrentPage }) => {
                           key === "sustainability"
                             ? "0.3"
                             : key === "barriers"
-                            ? "0"
-                            : "1"
+                              ? "0"
+                              : "1"
                         }
                         step="0.05"
                         value={value}
@@ -730,7 +742,9 @@ const TechAssessment = ({ setCurrentPage }) => {
                 <div
                   key={key}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm text-white"
-                  style={{ backgroundColor: badgeColors[idx % badgeColors.length] }}
+                  style={{
+                    backgroundColor: badgeColors[idx % badgeColors.length],
+                  }}
                 >
                   <Database size={16} />
                   {key} ({(datasetsMap[key] || []).length})
@@ -757,7 +771,7 @@ const TechAssessment = ({ setCurrentPage }) => {
                   {getAllTechnologyNames().map((techName, idx) => {
                     const results = calculateTISForAllDatasets(techName);
                     const tisValues = Object.values(results).map((r) =>
-                      parseFloat(r.tis)
+                      parseFloat(r.tis),
                     );
                     const avgTIS =
                       tisValues.length > 0
@@ -772,8 +786,8 @@ const TechAssessment = ({ setCurrentPage }) => {
                             tisValues.reduce(
                               (acc, val) =>
                                 acc + Math.pow(val - parseFloat(avgTIS), 2),
-                              0
-                            ) / tisValues.length
+                              0,
+                            ) / tisValues.length,
                           ).toFixed(2)
                         : "N/A";
 
@@ -789,7 +803,8 @@ const TechAssessment = ({ setCurrentPage }) => {
                         </td>
                         <td className="p-3">
                           <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
-                            {results[Object.keys(results)[0]]?.category || "N/A"}
+                            {results[Object.keys(results)[0]]?.category ||
+                              "N/A"}
                           </span>
                         </td>
                         {sourceKeys.map((key) => {
@@ -813,8 +828,8 @@ const TechAssessment = ({ setCurrentPage }) => {
                                     tis >= 8
                                       ? "bg-teal-500 text-white"
                                       : tis >= 6
-                                      ? "bg-blue-500 text-white"
-                                      : "bg-indigo-500 text-white"
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-indigo-500 text-white"
                                   }`}
                                 >
                                   {result.tis}
@@ -833,8 +848,8 @@ const TechAssessment = ({ setCurrentPage }) => {
                                 parseFloat(avgTIS) >= 8
                                   ? "bg-teal-600 text-white"
                                   : parseFloat(avgTIS) >= 6
-                                  ? "bg-blue-600 text-white"
-                                  : "bg-indigo-600 text-white"
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-indigo-600 text-white"
                               }`}
                             >
                               {avgTIS}
@@ -848,8 +863,8 @@ const TechAssessment = ({ setCurrentPage }) => {
                                 parseFloat(consistency) <= 1.0
                                   ? "text-teal-600"
                                   : parseFloat(consistency) <= 2.0
-                                  ? "text-blue-600"
-                                  : "text-indigo-600"
+                                    ? "text-blue-600"
+                                    : "text-indigo-600"
                               }`}
                             >
                               {consistency}

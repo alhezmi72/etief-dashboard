@@ -14,15 +14,13 @@ import {
 import useCSVExplorationDatasets from "./useCSVExplorationDatasets";
 
 const TechExploration = ({ setCurrentPage }) => {
-  const { datasetsMap, sourceKeys, createdDate, loading, error } = useCSVExplorationDatasets(
-    "./data/Exploration",
-    [
+  const { datasetsMap, sourceKeys, createdDate, loading, error } =
+    useCSVExplorationDatasets("./data/Exploration", [
       "Claude.csv",
       "ChatGPT.csv",
       "Gemini.csv",
       "DeepSeek.csv",
-    ]
-  );
+    ]);
 
   const [dataSource, setDataSource] = useState("");
   const [technologies, setTechnologies] = useState([]);
@@ -44,7 +42,9 @@ const TechExploration = ({ setCurrentPage }) => {
   // Initialize dataSource and technologies once datasets are loaded
   useEffect(() => {
     if (sourceKeys.length === 0) return;
-    const defaultKey = sourceKeys.includes("Claude-AI") ? "Claude-AI" : sourceKeys[0];
+    const defaultKey = sourceKeys.includes("ClaudeAI")
+      ? "ClaudeAI"
+      : sourceKeys[0];
     setDataSource(defaultKey);
     setTechnologies(datasetsMap[defaultKey] || []);
   }, [sourceKeys, datasetsMap]);
@@ -71,8 +71,8 @@ const TechExploration = ({ setCurrentPage }) => {
         Object.values(datasetsMap)
           .flat()
           .map((t) => t.category)
-          .filter(Boolean)
-      )
+          .filter(Boolean),
+      ),
     ).sort(),
   ];
 
@@ -129,8 +129,8 @@ const TechExploration = ({ setCurrentPage }) => {
                 x: Math.max(0, Math.min(100, x)),
                 y: Math.max(0, Math.min(100, y)),
               }
-            : t
-        )
+            : t,
+        ),
       );
     }
   };
@@ -215,7 +215,7 @@ const TechExploration = ({ setCurrentPage }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header matching App.jsx style */}
-      <header className="bg-gradient-to-r from-teal-600 via-blue-600 to-indigo-600 text-white py-4 px-6 shadow-xl">
+      <header className="bg-gradient-to-r from-teal-600 via-blue-600 to-indigo-600 text-white py-14 px-6 shadow-xl">
         <div className="max-w-5xl mx-auto">
           <div className="flex justify-between items-center">
             <div>
@@ -226,6 +226,18 @@ const TechExploration = ({ setCurrentPage }) => {
                 Explore emerging technologies via various LLM models
               </p>
             </div>
+          </div>
+          <div className="w-px h-4 bg-[#c7c4d8]/30 my-auto" />
+          <div>
+            <button
+              onClick={() => setCurrentPage("landing")}
+              className="flex items-center gap-2 px-6 py-3 bg-gray/20 hover:bg-gray/50 rounded-lg font-semibold transition-all backdrop-blur-sm text-white"
+              style={{
+                background: "linear-gradient(135deg, #4839cc 0%, #4f46e5 100%)",
+              }}
+            >
+              <ArrowLeft size={20} /> Back to Home
+            </button>
           </div>
         </div>
       </header>
@@ -252,12 +264,6 @@ const TechExploration = ({ setCurrentPage }) => {
                 <span>{view.label}</span>
               </button>
             ))}
-            <button
-              onClick={() => setCurrentPage("landing")}
-              className="flex items-center gap-2 px-6 py-3 bg-gray/20 hover:bg-gray/50 rounded-lg font-semibold transition-all backdrop-blur-sm text-green-800"
-            >
-              <ArrowLeft size={20} /> Back to Home
-            </button>
           </div>
         </div>
       </nav>
@@ -266,76 +272,79 @@ const TechExploration = ({ setCurrentPage }) => {
         {/* Filter Section */}
         <div className="bg-white p-6 rounded-lg shadow-sm mb-6 border border-gray-200">
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-3">
-              <label className="font-semibold text-gray-700">
+            <div className="flex bg-gray-50 rounded-full p-1 border border-[#c7c4d8]/15 gap-1">
+              {/* Data source */}
+              <label className="bg-transparent border-none text-s font-label text-slate-700 py-1.5 pl-3 pr-8 focus:ring-0">
                 Data Source:
               </label>
               <select
                 value={dataSource}
                 onChange={(e) => handleDataSourceChange(e.target.value)}
-                className="px-4 py-2 bg-gray-50 border-2 border-gray-200 rounded-lg text-gray-700 font-medium focus:border-teal-500 focus:outline-none"
+                className="bg-transparent border-none text-s text-slate-700 py-1.5 pl-3 pr-8 focus:ring-0 outline-none"
+                style={{ fontFamily: "Manrope, sans-serif" }}
               >
                 {sourceKeys.map((key) => (
                   <option key={key} value={key}>
-                    {key} Dataset
+                    {key}
                   </option>
                 ))}
               </select>
-            </div>
-
-            <div className="flex items-center gap-3 flex-wrap">
-              <label className="font-semibold text-gray-700">
-                Filter Category:
-              </label>
-              {/* Radio buttons: All (default) vs Fixed (persist across source switches) */}
-              <div className="flex items-center gap-3 text-sm">
-                <label className="flex items-center gap-1 cursor-pointer">
+              <div className="w-px h-4 bg-[#c7c4d8]/30 my-auto" />
+              {/* Category */}
+              <div className="flex items-center gap-1 pl-2">
+                {/* All / Fixed radios */}
+                <label
+                  className="flex items-center gap-1 text-[14px] text-slate-700 cursor-pointer"
+                  style={{ fontFamily: "Manrope, sans-serif" }}
+                >
                   <input
                     type="radio"
-                    name="categoryMode"
+                    name="catMode"
                     checked={!categoryLocked}
                     onChange={() => {
                       setCategoryLocked(false);
                       setFilterCategory("all");
                     }}
-                    className="accent-teal-600"
+                    className="w-3 h-3 accent-indigo-600"
                   />
-                  <span className="text-gray-600">All</span>
+                  All
                 </label>
-                <label className="flex items-center gap-1 cursor-pointer">
+                <label
+                  className="flex items-center gap-1 text-[15px] text-slate-700 cursor-pointer ml-1"
+                  style={{ fontFamily: "Manrope, sans-serif" }}
+                >
                   <input
                     type="radio"
-                    name="categoryMode"
+                    name="catMode"
                     checked={categoryLocked}
                     onChange={() => setCategoryLocked(true)}
-                    className="accent-teal-600"
+                    className="w-3 h-3 accent-indigo-600"
                   />
-                  <span className="text-gray-600">Fixed</span>
+                  Fixed
                 </label>
+                <select
+                  value={filterCategory}
+                  onChange={(e) => {
+                    setFilterCategory(e.target.value);
+                    if (e.target.value !== "all") setCategoryLocked(true);
+                    else setCategoryLocked(false);
+                  }}
+                  className="bg-transparent border-none text-s text-slate-700 py-1.5 pl-2 pr-6 focus:ring-0 outline-none"
+                  style={{ fontFamily: "Manrope, sans-serif" }}
+                >
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat === "all" ? "All Categories" : cat}
+                    </option>
+                  ))}
+                </select>
+                {categoryLocked && filterCategory !== "all" && (
+                  <span className="text-xs font-medium px-2 py-1 bg-teal-100 text-teal-700 rounded-full border border-teal-300">
+                    📌 Pinned
+                  </span>
+                )}
               </div>
-              <select
-                value={filterCategory}
-                onChange={(e) => {
-                  setFilterCategory(e.target.value);
-                  // Selecting a specific category implicitly enables lock mode.
-                  if (e.target.value !== "all") setCategoryLocked(true);
-                  else setCategoryLocked(false);
-                }}
-                className="px-4 py-2 bg-gray-50 border-2 border-gray-200 rounded-lg text-gray-700 font-medium focus:border-teal-500 focus:outline-none"
-              >
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat === "all" ? "All Categories" : cat}
-                  </option>
-                ))}
-              </select>
-              {categoryLocked && filterCategory !== "all" && (
-                <span className="text-xs font-medium px-2 py-1 bg-teal-100 text-teal-700 rounded-full border border-teal-300">
-                  📌 Pinned
-                </span>
-              )}
             </div>
-
             <span className="text-gray-500 text-sm ml-auto">
               Showing {filteredTech.length} of {technologies.length}{" "}
               technologies{createdDate ? `, created on ${createdDate}` : ""}
@@ -513,7 +522,7 @@ const TechExploration = ({ setCurrentPage }) => {
                   desc: "High impact, near-term deployment",
                   color: "border-green-500 bg-green-50",
                   techs: filteredTech.filter(
-                    (t) => getMatrixQuadrant(t) === "Quick Wins"
+                    (t) => getMatrixQuadrant(t) === "Quick Wins",
                   ),
                 },
                 {
@@ -521,7 +530,7 @@ const TechExploration = ({ setCurrentPage }) => {
                   desc: "High impact, long-term investment",
                   color: "border-blue-500 bg-blue-50",
                   techs: filteredTech.filter(
-                    (t) => getMatrixQuadrant(t) === "Strategic Bets"
+                    (t) => getMatrixQuadrant(t) === "Strategic Bets",
                   ),
                 },
                 {
@@ -529,7 +538,7 @@ const TechExploration = ({ setCurrentPage }) => {
                   desc: "Moderate impact, quick gains",
                   color: "border-yellow-500 bg-yellow-50",
                   techs: filteredTech.filter(
-                    (t) => getMatrixQuadrant(t) === "Incremental"
+                    (t) => getMatrixQuadrant(t) === "Incremental",
                   ),
                 },
                 {
@@ -537,7 +546,7 @@ const TechExploration = ({ setCurrentPage }) => {
                   desc: "Early-stage, requires monitoring",
                   color: "border-purple-500 bg-purple-50",
                   techs: filteredTech.filter(
-                    (t) => getMatrixQuadrant(t) === "Exploratory"
+                    (t) => getMatrixQuadrant(t) === "Exploratory",
                   ),
                 },
               ].map((quadrant, idx) => (
@@ -697,7 +706,7 @@ const TechExploration = ({ setCurrentPage }) => {
                     .sort(
                       (a, b) =>
                         parseFloat(calculateTIS(b)) -
-                        parseFloat(calculateTIS(a))
+                        parseFloat(calculateTIS(a)),
                     )
                     .map((tech) => {
                       const tis = parseFloat(calculateTIS(tech));
@@ -728,8 +737,8 @@ const TechExploration = ({ setCurrentPage }) => {
                                 tech.impact >= 8
                                   ? "bg-green-100 text-green-800 border border-green-300"
                                   : tech.impact >= 6
-                                  ? "bg-yellow-100 text-yellow-800 border border-yellow-300"
-                                  : "bg-red-100 text-red-800 border border-red-300"
+                                    ? "bg-yellow-100 text-yellow-800 border border-yellow-300"
+                                    : "bg-red-100 text-red-800 border border-red-300"
                               }`}
                             >
                               {tech.impact}/10
@@ -741,8 +750,8 @@ const TechExploration = ({ setCurrentPage }) => {
                                 tech.strategicFit >= 8
                                   ? "bg-green-100 text-green-800 border border-green-300"
                                   : tech.strategicFit >= 6
-                                  ? "bg-yellow-100 text-yellow-800 border border-yellow-300"
-                                  : "bg-red-100 text-red-800 border border-red-300"
+                                    ? "bg-yellow-100 text-yellow-800 border border-yellow-300"
+                                    : "bg-red-100 text-red-800 border border-red-300"
                               }`}
                             >
                               {tech.strategicFit}/10
@@ -754,8 +763,8 @@ const TechExploration = ({ setCurrentPage }) => {
                                 tech.barriers <= 3
                                   ? "bg-green-100 text-green-800 border border-green-300"
                                   : tech.barriers <= 6
-                                  ? "bg-yellow-100 text-yellow-800 border border-yellow-300"
-                                  : "bg-red-100 text-red-800 border border-red-300"
+                                    ? "bg-yellow-100 text-yellow-800 border border-yellow-300"
+                                    : "bg-red-100 text-red-800 border border-red-300"
                               }`}
                             >
                               {tech.barriers}/10
@@ -767,8 +776,8 @@ const TechExploration = ({ setCurrentPage }) => {
                                 tech.sustainability <= 3
                                   ? "bg-green-100 text-green-800 border border-green-300"
                                   : tech.sustainability <= 6
-                                  ? "bg-yellow-100 text-yellow-800 border border-yellow-300"
-                                  : "bg-red-100 text-red-800 border border-red-300"
+                                    ? "bg-yellow-100 text-yellow-800 border border-yellow-300"
+                                    : "bg-red-100 text-red-800 border border-red-300"
                               }`}
                             >
                               {tech.sustainability}/10
@@ -780,8 +789,8 @@ const TechExploration = ({ setCurrentPage }) => {
                                 tis >= 8
                                   ? "bg-green-500"
                                   : tis >= 6
-                                  ? "bg-yellow-500"
-                                  : "bg-red-500"
+                                    ? "bg-yellow-500"
+                                    : "bg-red-500"
                               }`}
                             >
                               {tis}
