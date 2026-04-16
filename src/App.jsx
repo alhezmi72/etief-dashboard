@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 
 import TechAssessment from "./components/TechAssessment.jsx";
-//import TechExpDashboard from "./TechExpDashboard.jsx";
 import LandingPage from "./components/LandingPage.jsx";
-//import TechnologyDataComponent from "./TechnologyDataComponent.jsx";
 import TechExploration from "./components/TechExploration.jsx";  
 
 // Main App Component
@@ -21,7 +19,6 @@ const App = () => {
       {currentPage === "exploration" && (
         <TechExploration setCurrentPage={setCurrentPage} />
       )}
-
     </div>
   );
 };
