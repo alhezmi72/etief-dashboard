@@ -10,6 +10,7 @@ import {
   FileText,
   Database,
   BarChart3,
+  Wrench,
 } from "lucide-react";
 
 import useCSVExplorationDatasets from "./useCSVExplorationDatasets";
@@ -243,17 +244,27 @@ const TechAssessment = ({ setCurrentPage }) => {
           </div>
         </div>
         <div className="w-px h-4 bg-[#c7c4d8]/30 my-auto" />
-        <div className="max-w-7xl mx-auto mt-6">
-          <button
-            onClick={() => setCurrentPage("landing")}
-            className="flex items-center gap-2 px-6 py-3 bg-gray/20 hover:bg-gray/50 rounded-lg font-semibold transition-all backdrop-blur-sm text-white"
-            style={{
-              background: "linear-gradient(135deg, #4839cc 0%, #4f46e5 100%)",
-            }}
-          >
-            <ArrowLeft size={20} /> Back to Home
-          </button>
-        </div>
+        <div class="mt-10 flex gap-4">
+            <button
+              onClick={() => setCurrentPage("exploration")}
+              class="flex items-center gap-2 bg-white text-primary px-8 py-4 rounded-full font-bold text-sm shadow-xl hover:bg-indigo-50 transition-colors"
+              style={{
+                background: "linear-gradient(135deg, #4839cc 0%, #4f46e5 100%)",
+              }}
+            >
+              <Wrench className="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" />
+              Exploration
+            </button>
+            <button
+              onClick={() => setCurrentPage("landing")}
+              class="flex items-center gap-2 bg-white/10 backdrop-blur-md text-white border border-white/20 px-8 py-4 rounded-full font-bold text-sm hover:bg-white/20 transition-colors"
+              style={{
+                background: "linear-gradient(135deg, #4839cc 0%, #4f46e5 100%)",
+              }}
+            >
+              <ArrowLeft size={20} /> Back to Home
+            </button>
+          </div>
       </header>
 
       <nav className="bg-white shadow-md sticky top-0 z-50">

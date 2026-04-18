@@ -11,6 +11,7 @@ import {
   PieChart,
   Wrench,
 } from "lucide-react";
+import HypeCyclePreview from "./HypeCyclePreview";
 
 const LandingPage = ({ setCurrentPage }) => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -663,8 +664,8 @@ const LandingPage = ({ setCurrentPage }) => {
                     item.score >= 60
                       ? "bg-teal-500"
                       : item.score >= 40
-                      ? "bg-blue-500"
-                      : "bg-red-500"
+                        ? "bg-blue-500"
+                        : "bg-red-500"
                   }`}
                   style={{ width: `${item.score}%` }}
                 ></div>
@@ -770,7 +771,7 @@ const LandingPage = ({ setCurrentPage }) => {
     { id: "stage3", label: "Stage 3", icon: Map },
     { id: "stage4", label: "Stage 4", icon: Activity },
     { id: "report", label: "Risk Report", icon: PieChart },
-   // { id: "tools", label: "Framework Tools", icon: Wrench },
+    // { id: "tools", label: "Framework Tools", icon: Wrench },
   ];
 
   const renderTools = () => (
@@ -818,28 +819,49 @@ const LandingPage = ({ setCurrentPage }) => {
             background: "linear-gradient(135deg, #4839cc 0%, #4f46e5 100%)",
           }}
         >
-          <div className="max-w-3xl relative z-10">
-            <p className="uppercase text-xs font-bold tracking-[0.3em] mb-4 text-indigo-200">
-              Foundational Overview
-            </p>
-            <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-6 leading-none">
-              Emerging Technology Exploration Framework
-            </h1>
-            <p className="text-xl leading-relaxed text-indigo-100 font-light">
-              A structured, intelligence-driven architecture for identifying,
-              analyzing, and deploying transformative technologies within
-              enterprise ecosystems
-            </p>
-            <div className="mt-10 flex flex-wrap gap-4">
-              <button
-                onClick={() => setActiveTab("tools")}
-                className="bg-white text-white px-8 py-4 rounded-full font-bold text-sm shadow-xl hover:bg-indigo-50 transition-all duration-300 hover:scale-105 inline-flex items-center gap-2.5 group"
-              >
-                <Wrench className="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" />
-                <span className="leading-tight">Framework Tools</span>
-              </button>
+          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8 relative z-10">
+            {/* Left side - Text content */}
+            <div className="flex-1 max-w-3xl">
+              <p className="uppercase text-xs font-bold tracking-[0.3em] mb-4 text-indigo-200">
+                Foundational Overview
+              </p>
+              <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-6 leading-none">
+                Emerging Technology Exploration Framework
+              </h1>
+              <p className="text-xl leading-relaxed text-indigo-100 font-light">
+                A structured, intelligence-driven architecture for identifying,
+                analyzing, and deploying transformative technologies within
+                enterprise ecosystems
+              </p>
+              <div className="mt-10 flex flex-wrap gap-4">
+                <button
+                  onClick={() => setActiveTab("tools")}
+                  className="bg-white text-white px-8 py-4 rounded-full font-bold text-sm shadow-xl hover:bg-indigo-50 transition-all duration-300 hover:scale-105 inline-flex items-center gap-2.5 group"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #3a70cd 0%, #4f46e5 100%)",
+                  }}
+                >
+                  <Wrench className="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" />
+                  <span className="leading-tight">Framework Tools</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Right side - Live Hype Cycle Graph */}
+            <div className="flex-1 flex justify-center lg:justify-end">
+              <div className="w-full min-w-[280px] max-w-[480px]">
+                <HypeCyclePreview
+                  directoryPath="./data/Exploration"
+                  fileName="Integrated.csv"
+                  category=""
+                  className="rounded-xl shadow-2xl"
+                />
+              </div>
             </div>
           </div>
+
+          {/* Background decorative elements */}
           <div className="absolute -right-20 -top-20 w-96 h-96 bg-white opacity-5 rounded-full blur-3xl pointer-events-none"></div>
           <div className="absolute right-40 bottom-0 w-64 h-64 bg-teal-400 opacity-10 rounded-full blur-3xl pointer-events-none"></div>
         </section>
