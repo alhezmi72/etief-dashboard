@@ -237,7 +237,7 @@ const TechExploration = ({ setCurrentPage }) => {
                 background: "linear-gradient(135deg, #4839cc 0%, #4f46e5 100%)",
               }}
             >
-              <Wrench className="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" />
+              <Wrench size={20} />
               Assessment
             </button>
             <button

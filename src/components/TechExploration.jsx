@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import useCSVExplorationDatasets from "./useCSVExplorationDatasets";
+import CSVUploader from "./CSVUploader";
 
 const TechExploration = ({ setCurrentPage }) => {
   const { datasetsMap, sourceKeys, createdDate, loading, error } =
@@ -38,17 +39,28 @@ const TechExploration = ({ setCurrentPage }) => {
 
   const [filterCategory, setFilterCategory] = useState("all");
   const [categoryLocked, setCategoryLocked] = useState(false);
+  // ── uploaded datasets (client-side additions / overrides) ────────────
+  const [uploadedDatasetsMap, setUploadedDatasetsMap] = useState({});
+  const [showUploader, setShowUploader] = useState(false);
   const svgRef = useRef(null);
+
+  // ── merged view: uploaded entries override / extend the hook datasets ──
+  const mergedDatasetsMap = { ...datasetsMap, ...uploadedDatasetsMap };
+  const mergedSourceKeys = [
+    ...sourceKeys,
+    ...Object.keys(uploadedDatasetsMap).filter((k) => !sourceKeys.includes(k)),
+  ];
 
   // Initialize dataSource and technologies once datasets are loaded
   useEffect(() => {
-    if (sourceKeys.length === 0) return;
-    const defaultKey = sourceKeys.includes("Integrated")
+    if (mergedSourceKeys.length === 0) return;
+    const defaultKey = mergedSourceKeys.includes("Integrated")
       ? "Integrated"
-      : sourceKeys[0];
+      : mergedSourceKeys[0];
     setDataSource(defaultKey);
-    setTechnologies(datasetsMap[defaultKey] || []);
-  }, [sourceKeys, datasetsMap]);
+    setTechnologies(mergedDatasetsMap[defaultKey] || []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sourceKeys, datasetsMap, uploadedDatasetsMap]);
 
   // Now safe to do conditional returns
   if (loading) return <div>Loading technology data...</div>;
@@ -57,7 +69,7 @@ const TechExploration = ({ setCurrentPage }) => {
   // Handle data source change
   const handleDataSourceChange = (source) => {
     setDataSource(source);
-    setTechnologies(datasetsMap[source] || []);
+    setTechnologies(mergedDatasetsMap[source] || []);
     setSelectedTech(null);
     // Only reset the category filter when it is not locked by the user.
     if (!categoryLocked) setFilterCategory("all");
@@ -69,7 +81,7 @@ const TechExploration = ({ setCurrentPage }) => {
     "all",
     ...Array.from(
       new Set(
-        Object.values(datasetsMap)
+        Object.values(mergedDatasetsMap)
           .flat()
           .map((t) => t.category)
           .filter(Boolean),
@@ -294,9 +306,9 @@ const TechExploration = ({ setCurrentPage }) => {
                 className="bg-transparent border-none text-s text-slate-700 py-1.5 pl-3 pr-8 focus:ring-0 outline-none"
                 style={{ fontFamily: "Manrope, sans-serif" }}
               >
-                {sourceKeys.map((key) => (
+                {mergedSourceKeys.map((key) => (
                   <option key={key} value={key}>
-                    {key}
+                    {key}{uploadedDatasetsMap[key] ? " ★" : ""}
                   </option>
                 ))}
               </select>
@@ -375,6 +387,15 @@ const TechExploration = ({ setCurrentPage }) => {
               >
                 <Save size={16} />
                 Save Snapshot
+              </button>
+
+              {/* ── Upload CSV ── */}
+              <button
+                onClick={() => setShowUploader(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Upload CSV
               </button>
             </div>
           </div>
@@ -849,6 +870,23 @@ const TechExploration = ({ setCurrentPage }) => {
           </p>
         </div>
       </footer>
+      {/* ── CSV Uploader modal ──────────────────────────────────────── */}
+      {showUploader && (
+        <CSVUploader
+          existingKeys={mergedSourceKeys}
+          onAdd={(key, rows) => {
+            setUploadedDatasetsMap((prev) => ({ ...prev, [key]: rows }));
+            handleDataSourceChange(key);
+            setShowUploader(false);
+          }}
+          onUpdate={(key, rows) => {
+            setUploadedDatasetsMap((prev) => ({ ...prev, [key]: rows }));
+            handleDataSourceChange(key);
+            setShowUploader(false);
+          }}
+          onClose={() => setShowUploader(false)}
+        />
+      )}
     </div>
   );
 };
