@@ -1,31 +1,31 @@
-id,name,phase,x,y,trl,impact,barriers,sustainability,strategicFit,category,notes,source
-1,AI for Climate Resilience,slope,65,54,8.0,10.0,4.0,2.0,10.0,"Energy, Climate & Materials",AI-driven modeling for predicting and mitigating climate impacts on cities and mobility.,McKinsey 2025
-2,Edge AI & Federated Learning,slope,54,51,8.0,9.0,3.0,3.0,10.0,Computing & Infrastructure,"Decentralized AI enabling low-latency analytics in mobility and IoT ecosystems.","Gartner 2025, CB Insights 2025"
-3,Collaborative Sensing Networks,slope,67,53,7.0,9.0,4.0,3.0,10.0,Connectivity & IoT,AI-enhanced sensor fusion supporting adaptive infrastructure and smart mobility systems.,WEF 2025
-4,AI-Driven Cyber Defense,slope,83,49,8.0,9.0,4.0,3.0,10.0,"Security, Trust & Privacy","Self-learning cybersecurity systems protecting AI, IoT, and robotic platforms.",McKinsey 2025
-5,Decentralized Digital Identity (DID),slope,80,50,7.0,9.0,5.0,3.0,10.0,"Security, Trust & Privacy",Privacy-preserving identity systems foundational for secure mobility ecosystems.,WEF 2025
-6,Generative AI & Multimodal Models,slope,50,38,8.0,9.0,3.0,4.0,9.0,AI & Automation,"Mature generative models combining text, vision, and audio for city planning, robotics, and analytics.","Gartner 2024, CB Insights 2025"
-7,Bio-Digital Interfaces,innovation,12,60,4.0,10.0,8.0,5.0,10.0,"Health, Bio & Experience Tech",Brain-computer and neural interface systems connecting cognition with robotics and smart devices.,McKinsey 2025
-8,Edge AI for Computer Vision,enlightenment,60,57,8.0,9.0,5.5,5.5,9.5,AI & Automation,Real-time video analytics for traffic management and public safety,"Gartner 2024, McKinsey 2024"
-9,AI Safety & Governance Platforms,slope,52,45,7.0,8.0,5.0,3.0,10.0,"Security, Trust & Privacy","Responsible AI, risk management, and compliance tooling supporting ethical smart city operations.","WEF 2025, McKinsey 2025"
-10,Post-Quantum Cryptography,slope,73,52,6.0,9.0,5.0,4.0,9.0,Quantum Technologies,Quantum-resilient cryptography securing mobility and IoT networks.,WEF 2025
-11,Urban Digital Twins,innovation,9,81,6.0,9.0,8.0,2.5,10.0,Computing & Infrastructure,"Dynamic virtual model of a city for planning, simulation, and disaster response","WEF 2024, McKinsey 2024"
-12,Green IT & Sustainable Data Centers,slope,88,47,9.0,8.0,3.0,2.0,9.0,"Energy, Climate & Materials",Energy-optimized infrastructure minimizing data center carbon footprint.,CB Insights 2025
-13,AI-Augmented Robotics Programming,enlightenment,74,50,7.0,8.5,6.0,2.0,9.5,AI & Automation,Drastically reduces time to program and re-task industrial and service robots,Gartner 2024
-14,Agentic AI,peak,24,20,4.3,9.4,7.0,5.7,9.0,AI & Automation,"Autonomous AI systems capable of task orchestration and decision-making. Foundational for smart mobility and robotics applications.","Gartner 2024, McKinsey 2025"
-15,Multi-Agent Systems,innovation,9,79,3.5,9.0,7.5,4.5,9.5,AI & Automation,Networks of cooperative AI agents enabling distributed decision-making in mobility and robotics.,Gartner 2025
-16,Generative AI for City Management,peak,40,15,7.0,9.5,7.5,6.5,9.0,AI & Automation,"For simulating urban scenarios, automating public services, and generating traffic/utility plans","Gartner 2024, McKinsey 2024"
-17,Multi-Modal Fusion Sensing,enlightenment,63,55,6.0,8.5,7.0,2.0,9.5,Connectivity & IoT,"Combining LiDAR, radar and camera data for robust perception",Robotics Industry 2024
-18,Swarm Robotics,innovation,16,45,4.5,8.75,7.75,4.0,9.5,Robotics & Physical Systems,"Cooperative robotic systems for autonomous maintenance, agriculture, and public safety operations.",McKinsey 2025
-19,Humanoid Robots,peak,35,12,5.0,8.5,8.5,6.0,10.0,Robotics & Physical Systems,"Human-like robots transforming logistics, healthcare, and service industries in future smart cities.",Gartner 2024
-20,5G/6G Advanced Network Slicing,enlightenment,72,52,7.0,8.5,6.0,2.5,9.0,Connectivity & IoT,Dedicated virtual networks for critical services and robotics,Gartner 2024
-21,AI-Driven Predictive Maintenance,enlightenment,83,50,7.0,8.0,5.0,2.0,9.0,AI & Automation,For city infrastructure and robotic fleets to prevent failures,McKinsey 2024
-22,Circular Electronics Manufacturing,innovation,15,445,5.0,8.0,5.0,2.0,9.0,"Energy, Climate & Materials",Circular production models reducing e-waste across smart city ecosystems.,WEF 2025
-23,Quantum-Safe Networking,innovation,14,54,4.0,9.0,8.0,5.0,9.0,Quantum Technologies,Quantum-secure communications protecting next-gen city and robotic systems.,Gartner 2025
-24,Collaborative Sensing,slope,68,54,6.0,7.0,6.0,2.0,10.0,Connectivity & IoT,Distributed sensor networks with AI,WEF 2025
-25,Satellite Internet Constellations,plateau,85,48,8.0,8.0,4.0,4.0,8.0,Connectivity & IoT,Low Earth orbit satellite networks delivering global IoT connectivity.,CB Insights 2025
-26,Satellite Constellation Tech,plateau,82,50,8.0,8.0,4.0,6.0,8.0,Connectivity & IoT,LEO commercialization,CB Insights 2025
-27,Pervasive Ambient IoT,innovation,13,55,4.0,8.0,8.0,4.0,9.5,Connectivity & IoT,Billions of tiny batteryless sensors embedded in the environment,Gartner 2024
-28,Application-Specific Semiconductors,slope,74,51,7.0,9.0,7.0,5.0,8.0,Computing & Infrastructure,Purpose-built chips for AI workloads,McKinsey 2025
-29,Next-Gen Nuclear (SMRs),slope,63,56,7.0,9.0,7.0,3.0,8.0,"Energy, Climate & Materials","Small modular reactors providing decentralized, safe energy for smart city grids.",WEF 2025
-30,6G Networks,innovation,10,75,3.0,8.5,8.5,5.0,9.0,Connectivity & IoT,Ultra-low latency wireless foundation for robotics and IoT ecosystems.,Gartner 2024
+"id","name","category","trl","impact","strategicFit","barriers","sustainability","x","y","source","notes"
+"1","AI for Climate Resilience","Energy, Climate & Materials","8","10","10","4","2","66.39","54.53","McKinsey 2025","AI-driven modeling for predicting and mitigating climate impacts on cities and mobility."
+"2","Edge AI & Federated Learning","Computing & Infrastructure","8","9","10","3","3","54.00","51.00","Gartner 2025, CB Insights 2025","Decentralized AI enabling low-latency analytics in mobility and IoT ecosystems."
+"3","Collaborative Sensing Networks","Connectivity & IoT","7","9","10","4","3","69.35","53.48","WEF 2025","AI-enhanced sensor fusion supporting adaptive infrastructure and smart mobility systems."
+"4","AI-Driven Cyber Defense","Security, Trust & Privacy","8","9","10","4","3","83.00","49.00","McKinsey 2025","Self-learning cybersecurity systems protecting AI, IoT, and robotic platforms."
+"5","Decentralized Digital Identity (DID)","Security, Trust & Privacy","7","9","10","5","3","80.00","50.00","WEF 2025","Privacy-preserving identity systems foundational for secure mobility ecosystems."
+"6","Generative AI & Multimodal Models","AI & Automation","8","9","9","3","4","50.00","38.00","Gartner 2024, CB Insights 2025","Mature generative models combining text, vision, and audio for city planning, robotics, and analytics."
+"7","Bio-Digital Interfaces","Health, Bio & Experience Tech","4","10","10","8","5","12.00","60.00","McKinsey 2025","Brain-computer and neural interface systems connecting cognition with robotics and smart devices."
+"8","Edge AI for Computer Vision","AI & Automation","8","9","9.5","5.5","5.5","57.67","56.35","Gartner 2024, McKinsey 2024","Real-time video analytics for traffic management and public safety"
+"9","AI Safety & Governance Platforms","Security, Trust & Privacy","7","8","10","5","3","52.00","45.00","WEF 2025, McKinsey 2025","Responsible AI, risk management, and compliance tooling supporting ethical smart city operations."
+"10","Post-Quantum Cryptography","Quantum Technologies","6","9","9","5","4","71.88","52.18","WEF 2025","Quantum-resilient cryptography securing mobility and IoT networks."
+"11","Urban Digital Twins","Computing & Infrastructure","6","9","10","8","2.5","7.90","85.52","WEF 2024, McKinsey 2024","Dynamic virtual model of a city for planning, simulation, and disaster response"
+"12","Green IT & Sustainable Data Centers","Energy, Climate & Materials","9","8","9","3","2","91.92","45.67","CB Insights 2025","Energy-optimized infrastructure minimizing data center carbon footprint."
+"13","AI-Augmented Robotics Programming","AI & Automation","7","8.5","9.5","6","2","74.00","50.00","Gartner 2024","Drastically reduces time to program and re-task industrial and service robots"
+"14","Agentic AI","AI & Automation","4.3","9.4","9","7","5.7","23.50","18.69","Gartner 2024, McKinsey 2025","Autonomous AI systems capable of task orchestration and decision-making. Foundational for smart mobility and robotics applications."
+"15","Multi-Agent Systems","AI & Automation","3.5","9","9.5","7.5","4.5","9.38","75.36","Gartner 2025","Networks of cooperative AI agents enabling distributed decision-making in mobility and robotics."
+"16","Generative AI for City Management","AI & Automation","7","9.5","9","7.5","6.5","41.20","17.39","Gartner 2024, McKinsey 2024","For simulating urban scenarios, automating public services, and generating traffic/utility plans"
+"17","Multi-Modal Fusion Sensing","Connectivity & IoT","6","8.5","9.5","7","2","59.94","57.13","Robotics Industry 2024","Combining LiDAR, radar and camera data for robust perception"
+"18","Swarm Robotics","Robotics & Physical Systems","4.5","8.75","9.5","7.75","4","16.00","45.00","McKinsey 2025","Cooperative robotic systems for autonomous maintenance, agriculture, and public safety operations."
+"19","Humanoid Robots","Robotics & Physical Systems","5","8.5","10","8.5","6","35.00","12.00","Gartner 2024","Human-like robots transforming logistics, healthcare, and service industries in future smart cities."
+"20","5G/6G Advanced Network Slicing","Connectivity & IoT","7","8.5","9","6","2.5","74.58","51.45","Gartner 2024","Dedicated virtual networks for critical services and robotics"
+"21","AI-Driven Predictive Maintenance","AI & Automation","7","8","9","5","2","85.30","47.49","McKinsey 2024","For city infrastructure and robotic fleets to prevent failures"
+"22","Circular Electronics Manufacturing","Energy, Climate & Materials","5","8","9","5","2","15.00","445.00","WEF 2025","Circular production models reducing e-waste across smart city ecosystems."
+"23","Quantum-Safe Networking","Quantum Technologies","4","9","9","8","5","14.44","49.58","Gartner 2025","Quantum-secure communications protecting next-gen city and robotic systems."
+"24","Collaborative Sensing","Connectivity & IoT","6","7","10","6","2","63.95","55.31","WEF 2025","Distributed sensor networks with AI"
+"25","Satellite Internet Constellations","Connectivity & IoT","8","8","8","4","4","88.70","46.71","CB Insights 2025","Low Earth orbit satellite networks delivering global IoT connectivity."
+"26","Satellite Constellation Tech","Connectivity & IoT","8","8","8","4","6","79.63","49.62","CB Insights 2025","LEO commercialization"
+"27","Pervasive Ambient IoT","Connectivity & IoT","4","8","9.5","8","4","13.00","55.00","Gartner 2024","Billions of tiny batteryless sensors embedded in the environment"
+"28","Application-Specific Semiconductors","Computing & Infrastructure","7","9","8","7","5","77.02","50.62","McKinsey 2025","Purpose-built chips for AI workloads"
+"29","Next-Gen Nuclear (SMRs)","Energy, Climate & Materials","7","9","8","7","3","62.03","56.61","WEF 2025","Small modular reactors providing decentralized, safe energy for smart city grids."
+"30","6G Networks","Connectivity & IoT","3","8.5","9","8.5","5","10.78","67.03","Gartner 2024","Ultra-low latency wireless foundation for robotics and IoT ecosystems."
