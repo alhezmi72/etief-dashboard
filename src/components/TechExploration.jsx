@@ -207,23 +207,58 @@ const TechExploration = ({ setCurrentPage }) => {
     a.click();
   };
 
+  // Download current dataset including updated x/y positions
+  const exportUpdatedDataset = () => {
+    const headers = [
+      "id","name","category","trl","impact","strategicFit",
+      "barriers","sustainability","x","y","source","notes",
+    ];
+    const rows = technologies.map((t) => [
+      t.id ?? "", t.name ?? "", t.category ?? "",
+      t.trl ?? "", t.impact ?? "", t.strategicFit ?? "",
+      t.barriers ?? "", t.sustainability ?? "",
+      typeof t.x === "number" ? t.x.toFixed(2) : (t.x ?? ""),
+      typeof t.y === "number" ? t.y.toFixed(2) : (t.y ?? ""),
+      t.source ?? "", t.notes ?? "",
+    ]);
+    const csv = [headers, ...rows]
+      .map((r) => r.map((c) => `"${c}"`).join(","))
+      .join("\n");
+    const a = Object.assign(document.createElement("a"), {
+      href: URL.createObjectURL(new Blob([csv], { type: "text/csv" })),
+      download: `${dataSource}-updated.csv`,
+    });
+    a.click();
+  };
+
   const filteredTech =
     filterCategory === "all"
       ? technologies
       : technologies.filter((t) => t.category === filterCategory);
 
-  // QMIC-inspired color palette matching App.jsx
-  const qmicColors = {
-    primary: "#00A651", // QMIC Green from App.jsx
-    secondary: "#1e40af", // Blue from gradient
-    accent: "#7e22ce", // Purple from gradient
-    darkBg: "#1a1a1a",
-    lightBg: "#f8fafc",
-    textDark: "#1f2937",
-    textLight: "#ffffff",
-    border: "#e5e7eb",
-    cardBg: "#ffffff",
-  };
+  // ── Category color palette ─────────────────────────────────────────────────
+  // Each category gets a distinct, accessible color. The palette cycles for
+  // datasets that have more categories than palette entries.
+  const CATEGORY_PALETTE = [
+    { fill: "#4f46e5", stroke: "#312e81", light: "#eef2ff", text: "#3730a3" }, // indigo
+    { fill: "#0891b2", stroke: "#155e75", light: "#ecfeff", text: "#0e7490" }, // cyan
+    { fill: "#16a34a", stroke: "#14532d", light: "#f0fdf4", text: "#15803d" }, // green
+    { fill: "#ea580c", stroke: "#7c2d12", light: "#fff7ed", text: "#c2410c" }, // orange
+    { fill: "#9333ea", stroke: "#581c87", light: "#faf5ff", text: "#7e22ce" }, // purple
+    { fill: "#db2777", stroke: "#831843", light: "#fdf2f8", text: "#be185d" }, // pink
+    { fill: "#ca8a04", stroke: "#713f12", light: "#fefce8", text: "#a16207" }, // yellow
+    { fill: "#0f766e", stroke: "#134e4a", light: "#f0fdfa", text: "#0f766e" }, // teal
+    { fill: "#dc2626", stroke: "#7f1d1d", light: "#fef2f2", text: "#b91c1c" }, // red
+    { fill: "#2563eb", stroke: "#1e3a8a", light: "#eff6ff", text: "#1d4ed8" }, // blue
+  ];
+
+  // Build a stable mapping from category name → palette entry.
+  const catList = Array.from(
+    new Set(technologies.map((t) => t.category).filter(Boolean))
+  ).sort();
+  const getCategoryColor = (cat) =>
+    CATEGORY_PALETTE[catList.indexOf(cat) % CATEGORY_PALETTE.length] ||
+    CATEGORY_PALETTE[0];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -392,7 +427,7 @@ const TechExploration = ({ setCurrentPage }) => {
               {/* ── Upload CSV ── */}
               <button
                 onClick={() => setShowUploader(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-green rounded-md hover:bg-indigo-700 transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 Upload CSV
@@ -466,77 +501,229 @@ const TechExploration = ({ setCurrentPage }) => {
                   </g>
                 ))}
 
-                {filteredTech.map((tech) => (
-                  <g
-                    key={tech.id}
-                    onMouseDown={() => handleMouseDown(tech)}
-                    onClick={() => setSelectedTech(tech)}
-                    className="cursor-pointer"
-                  >
-                    <circle
-                      cx={tech.x * 9}
-                      cy={tech.y * 4}
-                      r={dragging === tech.id ? 10 : 8}
-                      fill={
-                        tech.id === selectedTech?.id ? "#00A651" : "#1e40af"
-                      }
-                      stroke="#fff"
-                      strokeWidth="2"
-                    />
-                    <text
-                      x={tech.x * 9}
-                      y={tech.y * 4 - 12}
-                      textAnchor="middle"
-                      className="text-xs font-semibold fill-gray-900 pointer-events-none"
+                {filteredTech.map((tech) => {
+                  const col = getCategoryColor(tech.category);
+                  const isSelected = tech.id === selectedTech?.id;
+                  const isDrag = dragging === tech.id;
+                  return (
+                    <g
+                      key={tech.id}
+                      onMouseDown={() => handleMouseDown(tech)}
+                      onClick={() => setSelectedTech(tech)}
+                      className="cursor-pointer"
                     >
-                      {tech.name}
-                    </text>
-                  </g>
-                ))}
+                      {/* Selection ring */}
+                      {isSelected && (
+                        <circle
+                          cx={tech.x * 9}
+                          cy={tech.y * 4}
+                          r={16}
+                          fill="none"
+                          stroke={col.fill}
+                          strokeWidth="2"
+                          opacity="0.4"
+                        />
+                      )}
+                      <circle
+                        cx={tech.x * 9}
+                        cy={tech.y * 4}
+                        r={isDrag ? 11 : isSelected ? 10 : 8}
+                        fill={col.fill}
+                        stroke={isSelected ? "#fff" : col.stroke}
+                        strokeWidth={isSelected ? 3 : 1.5}
+                      />
+                      <text
+                        x={tech.x * 9}
+                        y={tech.y * 4 - 13}
+                        textAnchor="middle"
+                        style={{
+                          fontSize: "9px",
+                          fontWeight: 700,
+                          fill: "#1e293b",
+                          pointerEvents: "none",
+                        }}
+                      >
+                        {tech.name}
+                      </text>
+                    </g>
+                  );
+                })}
               </svg>
             </div>
 
-            {selectedTech && (
-              <div className="mt-6 p-6 bg-teal-50 rounded-lg border-l-4 border-teal-500">
-                <h3 className="text-2xl font-bold mb-4 text-teal-700">
-                  {selectedTech.name}
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                  <div>
-                    <span className="font-semibold text-gray-600">
-                      Category:
-                    </span>{" "}
-                    {selectedTech.category}
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-600">TRL:</span>{" "}
-                    {selectedTech.trl}/9
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-600">Impact:</span>{" "}
-                    {selectedTech.impact}/10
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-600">
-                      Strategic Fit:
-                    </span>{" "}
-                    {selectedTech.strategicFit}/10
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-600">TIS:</span>{" "}
-                    {calculateTIS(selectedTech)}
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-600">Source:</span>{" "}
-                    {selectedTech.source}
-                  </div>
-                  <div className="col-span-2 md:col-span-3">
-                    <span className="font-semibold text-gray-600">Notes:</span>{" "}
-                    {selectedTech.notes}
-                  </div>
-                </div>
+            {/* ── Category Legend ── */}
+            {catList.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-3">
+                {catList.map((cat) => {
+                  const col = getCategoryColor(cat);
+                  return (
+                    <div key={cat} className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full border"
+                         style={{ background: col.light, color: col.text, borderColor: col.fill + "55" }}>
+                      <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: col.fill }} />
+                      {cat}
+                    </div>
+                  );
+                })}
               </div>
             )}
+
+            {/* ── Selected tech info + position editor ── */}
+            {selectedTech && (() => {
+              const col = getCategoryColor(selectedTech.category);
+              return (
+                <div className="mt-5 rounded-xl border-l-4 overflow-hidden shadow-sm"
+                     style={{ borderColor: col.fill }}>
+                  {/* Header strip */}
+                  <div className="px-5 py-3 flex items-center justify-between"
+                       style={{ background: col.light }}>
+                    <div className="flex items-center gap-3">
+                      <span className="w-3 h-3 rounded-full" style={{ background: col.fill }} />
+                      <h3 className="text-lg font-bold" style={{ color: col.text }}>
+                        {selectedTech.name}
+                      </h3>
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full border"
+                            style={{ background: "#fff", color: col.text, borderColor: col.fill + "55" }}>
+                        {selectedTech.category}
+                      </span>
+                    </div>
+                    <button
+                      onClick={exportUpdatedDataset}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white shadow transition-opacity hover:opacity-90"
+                      style={{ background: col.fill }}
+                      title="Download current dataset with updated positions"
+                    >
+                      <Download size={13} />
+                      Download Updated Dataset
+                    </button>
+                  </div>
+
+                  <div className="bg-white px-5 py-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Left: tech attributes */}
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      {[
+                        { label: "TRL",          value: `${selectedTech.trl}/9`          },
+                        { label: "Impact",        value: `${selectedTech.impact}/10`       },
+                        { label: "Strategic Fit", value: `${selectedTech.strategicFit}/10` },
+                        { label: "TIS",           value: calculateTIS(selectedTech)        },
+                        { label: "Source",        value: selectedTech.source || "—"        },
+                      ].map(({ label, value }) => (
+                        <div key={label}>
+                          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{label}</span>
+                          <p className="font-semibold text-gray-800 mt-0.5">{value}</p>
+                        </div>
+                      ))}
+                      {selectedTech.notes && (
+                        <div className="col-span-2">
+                          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Notes</span>
+                          <p className="text-gray-700 mt-0.5 text-xs leading-relaxed">{selectedTech.notes}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right: position editor */}
+                    <div className="border-t md:border-t-0 md:border-l border-gray-100 md:pl-6 pt-4 md:pt-0">
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
+                        Position on Hype Curve
+                      </p>
+                      <div className="grid grid-cols-2 gap-4">
+                        {/* X position */}
+                        <div>
+                          <label className="text-xs font-semibold text-gray-600 mb-1 block">
+                            X — Maturity (0 – 100)
+                          </label>
+                          <input
+                            type="number"
+                            min={0} max={100} step={0.1}
+                            value={typeof selectedTech.x === "number" ? +selectedTech.x.toFixed(1) : 50}
+                            onChange={(e) => {
+                              const val = Math.max(0, Math.min(100, parseFloat(e.target.value) || 0));
+                              setTechnologies((prev) =>
+                                prev.map((t) => t.id === selectedTech.id ? { ...t, x: val } : t)
+                              );
+                              setSelectedTech((prev) => ({ ...prev, x: val }));
+                            }}
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                          />
+                          <input
+                            type="range"
+                            min={0} max={100} step={0.1}
+                            value={typeof selectedTech.x === "number" ? selectedTech.x : 50}
+                            onChange={(e) => {
+                              const val = parseFloat(e.target.value);
+                              setTechnologies((prev) =>
+                                prev.map((t) => t.id === selectedTech.id ? { ...t, x: val } : t)
+                              );
+                              setSelectedTech((prev) => ({ ...prev, x: val }));
+                            }}
+                            className="w-full mt-2 accent-indigo-600"
+                          />
+                        </div>
+                        {/* Y position */}
+                        <div>
+                          <label className="text-xs font-semibold text-gray-600 mb-1 block">
+                            Y — Visibility (0 – 100)
+                          </label>
+                          <input
+                            type="number"
+                            min={0} max={100} step={0.1}
+                            value={typeof selectedTech.y === "number" ? +selectedTech.y.toFixed(1) : 50}
+                            onChange={(e) => {
+                              const val = Math.max(0, Math.min(100, parseFloat(e.target.value) || 0));
+                              setTechnologies((prev) =>
+                                prev.map((t) => t.id === selectedTech.id ? { ...t, y: val } : t)
+                              );
+                              setSelectedTech((prev) => ({ ...prev, y: val }));
+                            }}
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                          />
+                          <input
+                            type="range"
+                            min={0} max={100} step={0.1}
+                            value={typeof selectedTech.y === "number" ? selectedTech.y : 50}
+                            onChange={(e) => {
+                              const val = parseFloat(e.target.value);
+                              setTechnologies((prev) =>
+                                prev.map((t) => t.id === selectedTech.id ? { ...t, y: val } : t)
+                              );
+                              setSelectedTech((prev) => ({ ...prev, y: val }));
+                            }}
+                            className="w-full mt-2 accent-indigo-600"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Phase quick-select */}
+                      <div className="mt-4">
+                        <p className="text-xs font-semibold text-gray-500 mb-2">Jump to Phase</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {[
+                            { label: "Trigger",    x: 10, y: 70 },
+                            { label: "Peak",       x: 27, y: 12 },
+                            { label: "Trough",     x: 42, y: 65 },
+                            { label: "Slope",      x: 62, y: 50 },
+                            { label: "Plateau",    x: 88, y: 45 },
+                          ].map(({ label, x, y }) => (
+                            <button
+                              key={label}
+                              onClick={() => {
+                                setTechnologies((prev) =>
+                                  prev.map((t) => t.id === selectedTech.id ? { ...t, x, y } : t)
+                                );
+                                setSelectedTech((prev) => ({ ...prev, x, y }));
+                              }}
+                              className="px-2.5 py-1 text-[11px] font-bold rounded-full border transition-colors hover:opacity-90"
+                              style={{ background: col.light, color: col.text, borderColor: col.fill + "66" }}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
 
