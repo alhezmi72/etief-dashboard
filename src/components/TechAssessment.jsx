@@ -895,7 +895,7 @@ const TechAssessment = ({ setCurrentPage }) => {
               <h3 className="text-lg font-bold text-gray-900 mb-3">
                 Tech Impact Score (TIS) Formula
               </h3>
-              <div className="font-mono text-sm bg-white p-4 rounded-lg border border-gray-200 mb-3">
+              <div className="font-mono text-gray-700 text-sm bg-white p-4 rounded-lg border border-gray-200 mb-3">
                 TIS = (TRL × {weights.trl.toFixed(2)}) + (Impact ×{" "}
                 {weights.impact.toFixed(2)}) + ((10 - Barriers) ×{" "}
                 {Math.abs(weights.barriers).toFixed(2)}) + ((10 -
