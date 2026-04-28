@@ -1,25 +1,31 @@
-id,name,phase,x,y,trl,impact,barriers,sustainability,strategicFit,category,notes,source
-1,Agentic AI,peak,38,14,4,10,8,9,10,AI & Automation,Autonomous AI systems on the Peak of Inflated Expectations. Focus is shifting from GenAI to the complexity of Agent Governance.,Gartner 2025
-2,Generative AI,trough,43,20,7,9,7,6,9,AI & Automation,Has moved into the Trough of Disillusionment as organizations struggle to prove ROI beyond initial content creation use cases.,Gartner 2025
-3,AI-Augmented Software Engineering,slope,65,54,7,8,4,5,8,AI & Automation,AI copilots and autonomous testing/deployment tools are proving value and scaling adoption.,Industry Consensus
-4,Multiagent Systems,peak,26,15,4,8,7,8,9,AI & Automation,"The foundational concept behind Agentic AI, sharing its high-hype, low-maturity position.",Gartner 2025
-5,Post-Quantum Cryptography (PQC),innovation,10,70,4,10,6,2,10,"Security, Trust & Privacy","Urgency is high due to the 'Harvest Now, Decrypt Later' risk, with material risk expected within five years.",Bain 2025
-6,Quantum Computing,innovation,24,20,3,10,9,8,9,Computing & Infrastructure,The 'Year of Quantum' in 2025 emphasizes strategic planning for hybrid solutions; practical utility is 5-10 years out.,McKinsey/Bain 2025
-7,Spatial Computing,peak,30,13,6,8,7,6,8,Computing & Infrastructure,"Driven by new hardware releases, expectations are high, but consumer adoption hurdles remain.",Industry Consensus
-8,Sustainable IT (GreenOps),plateau,90,45,9,9,3,1,9,"Energy, Climate & Materials","Practices like GreenOps and cloud optimization (serverless, containerization) are becoming standard and mandatory.",Crayon/ITU 2025
-9,Digital Immune Systems,slope,62,56,7,8,5,3,8,"Security, Trust & Privacy","Combining AI, observability, and resilience testing to create self-healing, fault-tolerant enterprise systems.",Gartner 2025
-10,Confidential Computing,slope,71,52,7,8,4,3,8,"Security, Trust & Privacy","Hardware-based security for data-in-use, seeing broad adoption across cloud providers for sensitive workloads.",Industry Consensus
-11,Cyber-Physical Systems,plateau,78,50,8,7,6,4,7,Robotics & Physical Systems,"Operational systems (OT) integrated with IT, driving smart factories and critical infrastructure.",Industry Consensus
-12,Verifiable Credentials (VCs),slope,75,51,7,8,5,4,8,"Security, Trust & Privacy","Core component of Decentralized Identity, with adoption accelerating due to regulatory pushes (e.g., EU eIDAS).",Gataca 2025
-13,Synthetic Data,trough,45,25,6,7,6,5,7,Computing & Infrastructure,"Value proven for privacy and testing, but struggles with fidelity and acceptance in regulatory contexts.",Industry Consensus
-14,Digital Humans,trough,47,30,5,6,8,7,6,"Health, Bio & Experience Tech",Moving out of peak hype as realism and scalability challenges become apparent.,Industry Consensus
-15,AI-Ready Data,peak,34,13,6,9,5,6,10,Computing & Infrastructure,"At the Peak of Inflated Expectations, as organizations realize existing data is insufficient for scaled AI.",Gartner 2025
-16,Federated Learning,slope,53,45,6,7,5,6,7,AI & Automation,"Scaling in use cases where privacy (e.g., healthcare, mobile) prevents centralized data pooling.",Industry Consensus
-17,Intelligent Applications,slope,81,49,8,7,3,4,8,AI & Automation,Established applications enhanced with embedded AI/ML to automate tasks and improve user experience.,Industry Consensus
-18,Low-Earth Orbit Comms (LEO),slope,58,56,7,8,6,7,7,Connectivity & IoT,"Moving past peak; focus is on terrestrial integration and cost reduction, not just coverage.",Industry Consensus
-19,Advanced Robotics,slope,68,51,7,8,4,4,8,Robotics & Physical Systems,Advanced manipulation and mobile robotics for logistics and manufacturing are maturing rapidly.,Industry Consensus
-20,Commercial Space Tech,slope,55,55,6,8,6,7,7,Connectivity & IoT,"Expansion of private capabilities for remote sensing, satellite services, and logistics.",Industry Consensus
-21,6G Networks,innovation,8,85,2,8,9,6,6,Connectivity & IoT,Fundamental research phase; concepts like AI-driven infrastructure and massive connectivity are emerging.,Industry Consensus
-22,Superapps,slope,84,49,7,7,5,7,7,"Health, Bio & Experience Tech","Proven concept in Asia, but facing integration and regulatory hurdles in Western markets.",Industry Consensus
-23,GitOps,plateau,87,47,8,7,3,4,8,Computing & Infrastructure,"A standard, mature practice for managing Kubernetes and cloud infrastructure via version control.",Industry Consensus
-24,Decentralized Identity (DID),slope,14,52,7,8.5,6,4,8,"Security, Trust & Privacy","Maturing rapidly, driven by European regulations and the need for user-centric, privacy-preserving identity management.",Gataca 2025
+"id","name","phase","x","y","trl","impact","barriers","sustainability","strategicFit","category","notes","source"
+"1","Agentic AI","Peak of Inflated Expectations","31.61","11.0","6","9","5","6","8","AI & Automation","Autonomous AI agents performing complex tasks.","Gartner"
+"2","Composite AI","Innovation Trigger","11.39","61.79","2","9","8","6","8","AI & Automation","Combining multiple AI techniques for better reasoning.","Gartner"
+"3","Generative AI (Multimodal)","Trough of Disillusionment","43.72","21.42","7","9","5","6","8","AI & Automation","Mainstream GenAI shifting toward video/audio.","McKinsey"
+"4","Post-Quantum Cryptography","Slope of Enlightenment","54.45","52.41","8","9","5","6","7","Security, Trust & Privacy","Securing data against future quantum attacks.","WEF"
+"5","Digital Immune Systems","Trough of Disillusionment","46.25","26.11","7","7","5","6","7","Security, Trust & Privacy","Autonomous system recovery and defense.","Gartner"
+"6","Non-Terrestrial Networks (NTN)","Innovation Trigger","18.45","33.66","4","7","8","6","10","Connectivity & IoT","Satellite-to-ground 5G/6G integration.","CB Insights"
+"7","6G Communications","Innovation Trigger","17.23","38.35","3","10","8","6","10","Connectivity & IoT","Next-gen ultra-low latency connectivity.","McKinsey"
+"8","Ambient IoT","Innovation Trigger","6.33","94.34","4","7","8","8","10","Connectivity & IoT","Battery-less sensors for massive IoT.","Gartner"
+"9","Private 5G/6G Networks","Slope of Enlightenment","59.5","58.14","7","10","5","6","10","Connectivity & IoT","Dedicated networks for industrial/port use.","Gartner"
+"10","Quantum Computing","Innovation Trigger","14.27","49.03","4","9","9","6","5","Quantum Technologies","Fault-tolerant quantum processing units.","McKinsey"
+"11","Quantum Sensors","Innovation Trigger","7.12","88.09","3","9","9","6","5","Quantum Technologies","Ultra-precise positioning and timing.","WEF"
+"12","Sustainable Aviation Fuel (SAF)","Slope of Enlightenment","52.61","47.72","8","7","9","10","5","Energy, Climate & Materials","Carbon-neutral propulsion for aviation.","WEF"
+"13","Green Hydrogen","Trough of Disillusionment","38.41","14.13","5","7","9","10","5","Energy, Climate & Materials","Hydrogen produced via renewable electrolysis.","McKinsey"
+"14","Carbon Capture (CCS)","Slope of Enlightenment","68.91","53.97","7","7","9","10","5","Energy, Climate & Materials","Direct air capture and storage.","CB Insights"
+"15","Sodium-ion Batteries","Innovation Trigger","8.43","81.84","2","7","9","10","5","Energy, Climate & Materials","Cheaper, safer alternative to Lithium.","WEF"
+"16","Humanoid Robots","Peak of Inflated Expectations","26.29","13.87","4","7","5","6","9","Robotics & Physical Systems","General purpose bipedal automation.","CB Insights"
+"17","Software-Defined Vehicles","Slope of Enlightenment","56.36","56.32","8","7","5","6","9","Robotics & Physical Systems","Decoupling hardware from vehicle features.","Gartner"
+"18","Autonomous Mobile Robots (AMR)","Plateau of Productivity","80.24","50.28","9","7","5","6","9","Robotics & Physical Systems","Fully commercialized warehouse automation.","Gartner"
+"19","Causal AI","Innovation Trigger","15.49","43.3","2","9","8","6","8","AI & Automation","AI that understands cause-and-effect.","Gartner"
+"20","PETs (Privacy Technologies)","Slope of Enlightenment","51.57","43.3","7","7","5","6","7","Security, Trust & Privacy","Encrypted data processing/Federated learning.","Gartner"
+"21","City-Scale Digital Twins","Slope of Enlightenment","64.47","56.06","8","7","5","6","9","Computing & Infrastructure","Real-time urban modeling and traffic simulation.","McKinsey"
+"22","Neuromorphic Computing","Innovation Trigger","10.34","68.56","4","7","8","6","6","Computing & Infrastructure","Hardware mimicking brain-like efficiency.","WEF"
+"23","Platform Engineering","Plateau of Productivity","84.51","48.2","9","7","5","6","6","Computing & Infrastructure","Optimized internal developer experiences.","Gartner"
+"24","Edge AI","Plateau of Productivity","90.09","45.59","9","9","5","6","8","AI & Automation","AI inference localized on edge devices.","McKinsey"
+"25","Spatial Computing","Trough of Disillusionment","47.73","31.32","5","7","5","6","5","Health, Bio & Experience Tech","Blending digital content with physical space.","CB Insights"
+"26","Brain-Computer Interfaces","Innovation Trigger","12.87","54.49","3","7","8","6","5","Health, Bio & Experience Tech","Neuralink and similar direct neural links.","WEF"
+"27","Synthetic Biology","Innovation Trigger","9.47","75.07","3","7","8","6","5","Health, Bio & Experience Tech","Redesigning organisms for specific purposes.","McKinsey"
+"28","Decentralized Identity","Trough of Disillusionment","41.55","17.77","6","7","5","6","7","Security, Trust & Privacy","User-controlled self-sovereign identity.","Gartner"
+"29","V2X (Vehicle-to-Everything)","Slope of Enlightenment","50.17","39.13","7","10","5","8","10","Connectivity & IoT","Standardized vehicle communication protocol.","Gartner"
+"30","AI-Augmented Engineering","Peak of Inflated Expectations","23.68","19.34","6","9","5","6","8","AI & Automation","AI-driven code generation and testing.","Gartner"

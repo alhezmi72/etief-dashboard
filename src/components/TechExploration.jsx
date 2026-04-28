@@ -7,12 +7,13 @@ import {
   PieChart,
   Grid,
   FileText,
-  ArrowLeft, 
-  Wrench
+  ArrowLeft,
+  Wrench,
 } from "lucide-react";
 
 import useCSVExplorationDatasets from "./useCSVExplorationDatasets";
 import CSVUploader from "./CSVUploader";
+import { consolidateDatasets } from "./DatasetConsolidation";
 
 const TechExploration = ({ setCurrentPage }) => {
   const { datasetsMap, sourceKeys, createdDate, loading, error } =
@@ -38,15 +39,36 @@ const TechExploration = ({ setCurrentPage }) => {
   });
 
   const [filterCategory, setFilterCategory] = useState("all");
-  const [categoryLocked, setCategoryLocked] = useState(false);
+  const [showConsolidated, setShowConsolidated] = useState(false);
   // ── uploaded datasets (client-side additions / overrides) ────────────
   const [uploadedDatasetsMap, setUploadedDatasetsMap] = useState({});
   const [showUploader, setShowUploader] = useState(false);
+  const [consolidatedDataset, setConsolidatedDataset] = useState([]);
   const svgRef = useRef(null);
 
-  // ── merged view: uploaded entries override / extend the hook datasets ──
-  const mergedDatasetsMap = { ...datasetsMap, ...uploadedDatasetsMap };
+  // Generate consolidated dataset when datasetsMap is available
+  useEffect(() => {
+    if (Object.keys(datasetsMap).length > 0) {
+      const datasetsToConsolidate = ["Claude", "ChatGPT", "Gemini", "DeepSeek"]
+        .map(key => datasetsMap[key])
+        .filter(Boolean);
+      
+      if (datasetsToConsolidate.length > 0) {
+        const result = consolidateDatasets(datasetsToConsolidate);
+        setConsolidatedDataset(result.technologies);
+      }
+    }
+  }, [datasetsMap]);
+
+  // ── merged view: consolidated (if enabled) + base datasets + uploaded entries ──
+  const mergedDatasetsMap = { 
+    ...(showConsolidated && consolidatedDataset.length > 0 ? { Consolidated: consolidatedDataset } : {}),
+    ...datasetsMap, 
+    ...uploadedDatasetsMap 
+  };
+  
   const mergedSourceKeys = [
+    ...(showConsolidated && consolidatedDataset.length > 0 ? ["Consolidated"] : []),
     ...sourceKeys,
     ...Object.keys(uploadedDatasetsMap).filter((k) => !sourceKeys.includes(k)),
   ];
@@ -54,13 +76,14 @@ const TechExploration = ({ setCurrentPage }) => {
   // Initialize dataSource and technologies once datasets are loaded
   useEffect(() => {
     if (mergedSourceKeys.length === 0) return;
+    // Default to Integrated if available, otherwise first key
     const defaultKey = mergedSourceKeys.includes("Integrated")
       ? "Integrated"
       : mergedSourceKeys[0];
     setDataSource(defaultKey);
     setTechnologies(mergedDatasetsMap[defaultKey] || []);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sourceKeys, datasetsMap, uploadedDatasetsMap]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sourceKeys, datasetsMap, uploadedDatasetsMap, showConsolidated, consolidatedDataset]);
 
   // Now safe to do conditional returns
   if (loading) return <div>Loading technology data...</div>;
@@ -71,8 +94,7 @@ const TechExploration = ({ setCurrentPage }) => {
     setDataSource(source);
     setTechnologies(mergedDatasetsMap[source] || []);
     setSelectedTech(null);
-    // Only reset the category filter when it is not locked by the user.
-    if (!categoryLocked) setFilterCategory("all");
+    //setFilterCategory("all");
   };
 
   // Derive categories from ALL datasets so the list is stable across source
@@ -90,6 +112,11 @@ const TechExploration = ({ setCurrentPage }) => {
   ];
 
   const calculateTIS = (tech) => {
+    // If TIS is already calculated (from consolidated dataset), return it
+    if (tech.tis !== undefined) {
+      return tech.tis.toFixed(2);
+    }
+    
     const score =
       tech.trl * weights.trl +
       tech.impact * weights.impact +
@@ -210,16 +237,34 @@ const TechExploration = ({ setCurrentPage }) => {
   // Download current dataset including updated x/y positions
   const exportUpdatedDataset = () => {
     const headers = [
-      "id","name","category","trl","impact","strategicFit",
-      "barriers","sustainability","x","y","source","notes",
+      "id",
+      "name",
+      "phase",
+      "x",
+      "y",
+      "trl",
+      "impact",
+      "barriers",
+      "sustainability",
+      "strategicFit",
+      "category",
+      "notes",
+      "source",
     ];
     const rows = technologies.map((t) => [
-      t.id ?? "", t.name ?? "", t.category ?? "",
-      t.trl ?? "", t.impact ?? "", t.strategicFit ?? "",
-      t.barriers ?? "", t.sustainability ?? "",
+      t.id ?? "",
+      t.name ?? "",
+      t.phase ?? "",
       typeof t.x === "number" ? t.x.toFixed(2) : (t.x ?? ""),
       typeof t.y === "number" ? t.y.toFixed(2) : (t.y ?? ""),
-      t.source ?? "", t.notes ?? "",
+      t.trl ?? "",
+      t.impact ?? "",
+      t.barriers ?? "",
+      t.sustainability ?? "",
+      t.strategicFit ?? "",
+      t.category ?? "",
+      t.notes ?? "",
+      t.source ?? "",
     ]);
     const csv = [headers, ...rows]
       .map((r) => r.map((c) => `"${c}"`).join(","))
@@ -254,7 +299,7 @@ const TechExploration = ({ setCurrentPage }) => {
 
   // Build a stable mapping from category name → palette entry.
   const catList = Array.from(
-    new Set(technologies.map((t) => t.category).filter(Boolean))
+    new Set(technologies.map((t) => t.category).filter(Boolean)),
   ).sort();
   const getCategoryColor = (cat) =>
     CATEGORY_PALETTE[catList.indexOf(cat) % CATEGORY_PALETTE.length] ||
@@ -271,25 +316,15 @@ const TechExploration = ({ setCurrentPage }) => {
                 Technology Exploration
               </h2>
               <p className="text-xl text-blue-50 max-w-3xl">
-                Explore emerging technologies via various LLM models
+                Explore emerging technologies obtained from various sources, visualize them on a Gartner-style Hype Cycle, and assess their potential impact and strategic fit
               </p>
             </div>
           </div>
           <div className="w-px h-4 bg-[#c7c4d8]/30 my-auto" />
-          <div class="mt-10 flex gap-4">
-            <button
-              onClick={() => setCurrentPage("assessment")}
-              class="flex items-center gap-2 bg-white text-primary px-8 py-4 rounded-full font-bold text-sm shadow-xl hover:bg-indigo-50 transition-colors"
-              style={{
-                background: "linear-gradient(135deg, #4839cc 0%, #4f46e5 100%)",
-              }}
-            >
-              <Wrench size={20} />
-              Assessment
-            </button>
+          <div className="mt-10 flex gap-4">
             <button
               onClick={() => setCurrentPage("landing")}
-              class="flex items-center gap-2 bg-white/10 backdrop-blur-md text-white border border-white/20 px-8 py-4 rounded-full font-bold text-sm hover:bg-white/20 transition-colors"
+              className="flex items-center gap-2 bg-white/10 backdrop-blur-md text-white border border-white/20 px-8 py-4 rounded-full font-bold text-sm hover:bg-white/20 transition-colors"
               style={{
                 background: "linear-gradient(135deg, #4839cc 0%, #4f46e5 100%)",
               }}
@@ -332,80 +367,67 @@ const TechExploration = ({ setCurrentPage }) => {
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex bg-gray-50 rounded-full p-1 border border-[#c7c4d8]/15 gap-1">
               {/* Data source */}
-              <label className="bg-transparent border-none text-s font-label text-slate-700 py-1.5 pl-3 pr-8 focus:ring-0">
+              <label className="bg-transparent border-none text-s font-label text-slate-700 py-1.5 pl-3 pr-2 focus:ring-0">
                 Data Source:
               </label>
               <select
                 value={dataSource}
                 onChange={(e) => handleDataSourceChange(e.target.value)}
-                className="bg-transparent border-none text-s text-slate-700 py-1.5 pl-3 pr-8 focus:ring-0 outline-none"
+                className="bg-transparent border-none text-s text-slate-700 py-1.5 pl-3 pr-8 focus:ring-0 outline-none font-semibold"
                 style={{ fontFamily: "Manrope, sans-serif" }}
               >
                 {mergedSourceKeys.map((key) => (
                   <option key={key} value={key}>
-                    {key}{uploadedDatasetsMap[key] ? " ★" : ""}
+                    {key === "Consolidated" ? "⭐ Consolidated (Multi-source)" : key}
+                    {uploadedDatasetsMap[key] ? " ★" : ""}
                   </option>
                 ))}
               </select>
               <div className="w-px h-4 bg-[#c7c4d8]/30 my-auto" />
               {/* Category */}
-              <div className="flex items-center gap-1 pl-2">
-                {/* All / Fixed radios */}
-                <label
-                  className="flex items-center gap-1 text-[14px] text-slate-700 cursor-pointer"
-                  style={{ fontFamily: "Manrope, sans-serif" }}
-                >
-                  <input
-                    type="radio"
-                    name="catMode"
-                    checked={!categoryLocked}
-                    onChange={() => {
-                      setCategoryLocked(false);
-                      setFilterCategory("all");
-                    }}
-                    className="w-3 h-3 accent-indigo-600"
-                  />
-                  All
-                </label>
-                <label
-                  className="flex items-center gap-1 text-[15px] text-slate-700 cursor-pointer ml-1"
-                  style={{ fontFamily: "Manrope, sans-serif" }}
-                >
-                  <input
-                    type="radio"
-                    name="catMode"
-                    checked={categoryLocked}
-                    onChange={() => setCategoryLocked(true)}
-                    className="w-3 h-3 accent-indigo-600"
-                  />
-                  Fixed
-                </label>
-                <select
-                  value={filterCategory}
-                  onChange={(e) => {
-                    setFilterCategory(e.target.value);
-                    if (e.target.value !== "all") setCategoryLocked(true);
-                    else setCategoryLocked(false);
-                  }}
-                  className="bg-transparent border-none text-s text-slate-700 py-1.5 pl-2 pr-6 focus:ring-0 outline-none"
-                  style={{ fontFamily: "Manrope, sans-serif" }}
-                >
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat === "all" ? "All Categories" : cat}
-                    </option>
-                  ))}
-                </select>
-                {categoryLocked && filterCategory !== "all" && (
-                  <span className="text-xs font-medium px-2 py-1 bg-teal-100 text-teal-700 rounded-full border border-teal-300">
-                    📌 Pinned
-                  </span>
-                )}
-              </div>
+              <label className="bg-transparent border-none text-s font-label text-slate-700 py-1.5 pl-3 pr-2 focus:ring-0">
+                Category:
+              </label>
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="bg-transparent border-none text-s text-slate-700 py-1.5 pl-2 pr-6 focus:ring-0 outline-none font-semibold"
+                style={{ fontFamily: "Manrope, sans-serif" }}
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat === "all" ? "All Categories" : cat}
+                  </option>
+                ))}
+              </select>
             </div>
+
+            {/* Show Consolidated Radio */}
+            <div className="flex items-center gap-2 px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-full">
+              <input
+                type="checkbox"
+                id="showConsolidated"
+                checked={showConsolidated}
+                onChange={(e) => setShowConsolidated(e.target.checked)}
+                className="w-4 h-4 accent-indigo-600 cursor-pointer"
+              />
+              <label
+                htmlFor="showConsolidated"
+                className="text-sm font-semibold text-yellow-800 cursor-pointer"
+                style={{ fontFamily: "Manrope, sans-serif" }}
+              >
+                Show Consolidated Dataset
+              </label>
+            </div>
+
             <span className="text-gray-500 text-sm ml-auto">
               Showing {filteredTech.length} of {technologies.length}{" "}
               technologies{createdDate ? `, created on ${createdDate}` : ""}
+              {dataSource === "Consolidated" && (
+                <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full font-semibold">
+                  Multi-Source Consensus
+                </span>
+              )}
             </span>
 
             <div className="flex gap-3">
@@ -429,7 +451,21 @@ const TechExploration = ({ setCurrentPage }) => {
                 onClick={() => setShowUploader(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-green rounded-md hover:bg-indigo-700 transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
                 Upload CSV
               </button>
             </div>
@@ -557,9 +593,19 @@ const TechExploration = ({ setCurrentPage }) => {
                 {catList.map((cat) => {
                   const col = getCategoryColor(cat);
                   return (
-                    <div key={cat} className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full border"
-                         style={{ background: col.light, color: col.text, borderColor: col.fill + "55" }}>
-                      <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: col.fill }} />
+                    <div
+                      key={cat}
+                      className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full border"
+                      style={{
+                        background: col.light,
+                        color: col.text,
+                        borderColor: col.fill + "55",
+                      }}
+                    >
+                      <span
+                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                        style={{ background: col.fill }}
+                      />
                       {cat}
                     </div>
                   );
@@ -568,162 +614,287 @@ const TechExploration = ({ setCurrentPage }) => {
             )}
 
             {/* ── Selected tech info + position editor ── */}
-            {selectedTech && (() => {
-              const col = getCategoryColor(selectedTech.category);
-              return (
-                <div className="mt-5 rounded-xl border-l-4 overflow-hidden shadow-sm"
-                     style={{ borderColor: col.fill }}>
-                  {/* Header strip */}
-                  <div className="px-5 py-3 flex items-center justify-between"
-                       style={{ background: col.light }}>
-                    <div className="flex items-center gap-3">
-                      <span className="w-3 h-3 rounded-full" style={{ background: col.fill }} />
-                      <h3 className="text-lg font-bold" style={{ color: col.text }}>
-                        {selectedTech.name}
-                      </h3>
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full border"
-                            style={{ background: "#fff", color: col.text, borderColor: col.fill + "55" }}>
-                        {selectedTech.category}
-                      </span>
-                    </div>
-                    <button
-                      onClick={exportUpdatedDataset}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white shadow transition-opacity hover:opacity-90"
-                      style={{ background: col.fill }}
-                      title="Download current dataset with updated positions"
+            {selectedTech &&
+              (() => {
+                const col = getCategoryColor(selectedTech.category);
+                return (
+                  <div
+                    className="mt-5 rounded-xl border-l-4 overflow-hidden shadow-sm"
+                    style={{ borderColor: col.fill }}
+                  >
+                    {/* Header strip */}
+                    <div
+                      className="px-5 py-3 flex items-center justify-between"
+                      style={{ background: col.light }}
                     >
-                      <Download size={13} />
-                      Download Updated Dataset
-                    </button>
-                  </div>
-
-                  <div className="bg-white px-5 py-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Left: tech attributes */}
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      {[
-                        { label: "TRL",          value: `${selectedTech.trl}/9`          },
-                        { label: "Impact",        value: `${selectedTech.impact}/10`       },
-                        { label: "Strategic Fit", value: `${selectedTech.strategicFit}/10` },
-                        { label: "TIS",           value: calculateTIS(selectedTech)        },
-                        { label: "Source",        value: selectedTech.source || "—"        },
-                      ].map(({ label, value }) => (
-                        <div key={label}>
-                          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{label}</span>
-                          <p className="font-semibold text-gray-800 mt-0.5">{value}</p>
-                        </div>
-                      ))}
-                      {selectedTech.notes && (
-                        <div className="col-span-2">
-                          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Notes</span>
-                          <p className="text-gray-700 mt-0.5 text-xs leading-relaxed">{selectedTech.notes}</p>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-3">
+                        <span
+                          className="w-3 h-3 rounded-full"
+                          style={{ background: col.fill }}
+                        />
+                        <h3
+                          className="text-lg font-bold"
+                          style={{ color: col.text }}
+                        >
+                          {selectedTech.name}
+                        </h3>
+                        <span
+                          className="text-xs font-semibold px-2 py-0.5 rounded-full border"
+                          style={{
+                            background: "#fff",
+                            color: col.text,
+                            borderColor: col.fill + "55",
+                          }}
+                        >
+                          {selectedTech.category}
+                        </span>
+                        {selectedTech.confidence && (
+                          <span
+                            className="text-xs font-semibold px-2 py-0.5 rounded-full border"
+                            style={{
+                              background: "#fef3c7",
+                              color: "#92400e",
+                              borderColor: "#fbbf24",
+                            }}
+                          >
+                            Confidence: {(selectedTech.confidence * 100).toFixed(0)}%
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        onClick={exportUpdatedDataset}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white shadow transition-opacity hover:opacity-90"
+                        style={{ background: col.fill }}
+                        title="Download current dataset with updated positions"
+                      >
+                        <Download size={13} />
+                        Download Updated Dataset
+                      </button>
                     </div>
 
-                    {/* Right: position editor */}
-                    <div className="border-t md:border-t-0 md:border-l border-gray-100 md:pl-6 pt-4 md:pt-0">
-                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
-                        Position on Hype Curve
-                      </p>
-                      <div className="grid grid-cols-2 gap-4">
-                        {/* X position */}
-                        <div>
-                          <label className="text-xs font-semibold text-gray-600 mb-1 block">
-                            X — Maturity (0 – 100)
-                          </label>
-                          <input
-                            type="number"
-                            min={0} max={100} step={0.1}
-                            value={typeof selectedTech.x === "number" ? +selectedTech.x.toFixed(1) : 50}
-                            onChange={(e) => {
-                              const val = Math.max(0, Math.min(100, parseFloat(e.target.value) || 0));
-                              setTechnologies((prev) =>
-                                prev.map((t) => t.id === selectedTech.id ? { ...t, x: val } : t)
-                              );
-                              setSelectedTech((prev) => ({ ...prev, x: val }));
-                            }}
-                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-300"
-                          />
-                          <input
-                            type="range"
-                            min={0} max={100} step={0.1}
-                            value={typeof selectedTech.x === "number" ? selectedTech.x : 50}
-                            onChange={(e) => {
-                              const val = parseFloat(e.target.value);
-                              setTechnologies((prev) =>
-                                prev.map((t) => t.id === selectedTech.id ? { ...t, x: val } : t)
-                              );
-                              setSelectedTech((prev) => ({ ...prev, x: val }));
-                            }}
-                            className="w-full mt-2 accent-indigo-600"
-                          />
-                        </div>
-                        {/* Y position */}
-                        <div>
-                          <label className="text-xs font-semibold text-gray-600 mb-1 block">
-                            Y — Visibility (0 – 100)
-                          </label>
-                          <input
-                            type="number"
-                            min={0} max={100} step={0.1}
-                            value={typeof selectedTech.y === "number" ? +selectedTech.y.toFixed(1) : 50}
-                            onChange={(e) => {
-                              const val = Math.max(0, Math.min(100, parseFloat(e.target.value) || 0));
-                              setTechnologies((prev) =>
-                                prev.map((t) => t.id === selectedTech.id ? { ...t, y: val } : t)
-                              );
-                              setSelectedTech((prev) => ({ ...prev, y: val }));
-                            }}
-                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-300"
-                          />
-                          <input
-                            type="range"
-                            min={0} max={100} step={0.1}
-                            value={typeof selectedTech.y === "number" ? selectedTech.y : 50}
-                            onChange={(e) => {
-                              const val = parseFloat(e.target.value);
-                              setTechnologies((prev) =>
-                                prev.map((t) => t.id === selectedTech.id ? { ...t, y: val } : t)
-                              );
-                              setSelectedTech((prev) => ({ ...prev, y: val }));
-                            }}
-                            className="w-full mt-2 accent-indigo-600"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Phase quick-select */}
-                      <div className="mt-4">
-                        <p className="text-xs font-semibold text-gray-500 mb-2">Jump to Phase</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {[
-                            { label: "Trigger",    x: 10, y: 70 },
-                            { label: "Peak",       x: 27, y: 12 },
-                            { label: "Trough",     x: 42, y: 65 },
-                            { label: "Slope",      x: 62, y: 50 },
-                            { label: "Plateau",    x: 88, y: 45 },
-                          ].map(({ label, x, y }) => (
-                            <button
-                              key={label}
-                              onClick={() => {
-                                setTechnologies((prev) =>
-                                  prev.map((t) => t.id === selectedTech.id ? { ...t, x, y } : t)
-                                );
-                                setSelectedTech((prev) => ({ ...prev, x, y }));
-                              }}
-                              className="px-2.5 py-1 text-[11px] font-bold rounded-full border transition-colors hover:opacity-90"
-                              style={{ background: col.light, color: col.text, borderColor: col.fill + "66" }}
-                            >
+                    <div className="bg-white px-5 py-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Left: tech attributes */}
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        {[
+                          { label: "Phase", value: `${selectedTech.phase}` },
+                          { label: "TRL", value: `${selectedTech.trl}/9` },
+                          {
+                            label: "Impact",
+                            value: `${selectedTech.impact}/10`,
+                          },
+                          {
+                            label: "Strategic Fit",
+                            value: `${selectedTech.strategicFit}/10`,
+                          },
+                          { label: "TIS", value: calculateTIS(selectedTech) },
+                          {
+                            label: "Source",
+                            value: selectedTech.source || "—",
+                          },
+                        ].map(({ label, value }) => (
+                          <div key={label}>
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
                               {label}
-                            </button>
-                          ))}
+                            </span>
+                            <p className="font-semibold text-gray-800 mt-0.5">
+                              {value}
+                            </p>
+                          </div>
+                        ))}
+                        {selectedTech.notes && (
+                          <div className="col-span-2">
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                              Notes
+                            </span>
+                            <p className="text-gray-700 mt-0.5 text-xs leading-relaxed">
+                              {selectedTech.notes}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Right: position editor */}
+                      <div className="border-t md:border-t-0 md:border-l border-gray-100 md:pl-6 pt-4 md:pt-0">
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">
+                          Position on Hype Curve
+                        </p>
+                        <div className="grid grid-cols-2 gap-4">
+                          {/* X position */}
+                          <div>
+                            <label className="text-xs font-semibold text-gray-600 mb-1 block">
+                              X — Maturity (0 – 100)
+                            </label>
+                            <input
+                              type="number"
+                              min={0}
+                              max={100}
+                              step={0.1}
+                              value={
+                                typeof selectedTech.x === "number"
+                                  ? +selectedTech.x.toFixed(1)
+                                  : 50
+                              }
+                              onChange={(e) => {
+                                const val = Math.max(
+                                  0,
+                                  Math.min(
+                                    100,
+                                    parseFloat(e.target.value) || 0,
+                                  ),
+                                );
+                                setTechnologies((prev) =>
+                                  prev.map((t) =>
+                                    t.id === selectedTech.id
+                                      ? { ...t, x: val }
+                                      : t,
+                                  ),
+                                );
+                                setSelectedTech((prev) => ({
+                                  ...prev,
+                                  x: val,
+                                }));
+                              }}
+                              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                            />
+                            <input
+                              type="range"
+                              min={0}
+                              max={100}
+                              step={0.1}
+                              value={
+                                typeof selectedTech.x === "number"
+                                  ? selectedTech.x
+                                  : 50
+                              }
+                              onChange={(e) => {
+                                const val = parseFloat(e.target.value);
+                                setTechnologies((prev) =>
+                                  prev.map((t) =>
+                                    t.id === selectedTech.id
+                                      ? { ...t, x: val }
+                                      : t,
+                                  ),
+                                );
+                                setSelectedTech((prev) => ({
+                                  ...prev,
+                                  x: val,
+                                }));
+                              }}
+                              className="w-full mt-2 accent-indigo-600"
+                            />
+                          </div>
+                          {/* Y position */}
+                          <div>
+                            <label className="text-xs font-semibold text-gray-600 mb-1 block">
+                              Y — Visibility (0 – 100)
+                            </label>
+                            <input
+                              type="number"
+                              min={0}
+                              max={100}
+                              step={0.1}
+                              value={
+                                typeof selectedTech.y === "number"
+                                  ? +selectedTech.y.toFixed(1)
+                                  : 50
+                              }
+                              onChange={(e) => {
+                                const val = Math.max(
+                                  0,
+                                  Math.min(
+                                    100,
+                                    parseFloat(e.target.value) || 0,
+                                  ),
+                                );
+                                setTechnologies((prev) =>
+                                  prev.map((t) =>
+                                    t.id === selectedTech.id
+                                      ? { ...t, y: val }
+                                      : t,
+                                  ),
+                                );
+                                setSelectedTech((prev) => ({
+                                  ...prev,
+                                  y: val,
+                                }));
+                              }}
+                              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                            />
+                            <input
+                              type="range"
+                              min={0}
+                              max={100}
+                              step={0.1}
+                              value={
+                                typeof selectedTech.y === "number"
+                                  ? selectedTech.y
+                                  : 50
+                              }
+                              onChange={(e) => {
+                                const val = parseFloat(e.target.value);
+                                setTechnologies((prev) =>
+                                  prev.map((t) =>
+                                    t.id === selectedTech.id
+                                      ? { ...t, y: val }
+                                      : t,
+                                  ),
+                                );
+                                setSelectedTech((prev) => ({
+                                  ...prev,
+                                  y: val,
+                                }));
+                              }}
+                              className="w-full mt-2 accent-indigo-600"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Phase quick-select */}
+                        <div className="mt-4">
+                          <p className="text-xs font-semibold text-gray-500 mb-2">
+                            Jump to Phase
+                          </p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {[
+                              { label: "Trigger", x: 10, y: 70 },
+                              { label: "Peak", x: 27, y: 12 },
+                              { label: "Trough", x: 42, y: 65 },
+                              { label: "Slope", x: 62, y: 50 },
+                              { label: "Plateau", x: 88, y: 45 },
+                            ].map(({ label, x, y }) => (
+                              <button
+                                key={label}
+                                onClick={() => {
+                                  setTechnologies((prev) =>
+                                    prev.map((t) =>
+                                      t.id === selectedTech.id
+                                        ? { ...t, x, y }
+                                        : t,
+                                    ),
+                                  );
+                                  setSelectedTech((prev) => ({
+                                    ...prev,
+                                    x,
+                                    y,
+                                  }));
+                                }}
+                                className="px-2.5 py-1 text-[11px] font-bold rounded-full border transition-colors hover:opacity-90"
+                                style={{
+                                  background: col.light,
+                                  color: col.text,
+                                  borderColor: col.fill + "66",
+                                }}
+                              >
+                                {label}
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })()}
+                );
+              })()}
           </div>
         )}
 
@@ -789,6 +960,7 @@ const TechExploration = ({ setCurrentPage }) => {
                         </div>
                         <div className="text-sm text-gray-500 mt-1">
                           TIS: {calculateTIS(tech)} | TRL: {tech.trl}
+                          {tech.confidence && ` | Conf: ${(tech.confidence * 100).toFixed(0)}%`}
                         </div>
                       </div>
                     ))}
@@ -918,6 +1090,9 @@ const TechExploration = ({ setCurrentPage }) => {
                     </th>
                     <th className="p-3 text-center font-semibold">TIS</th>
                     <th className="p-3 text-left font-semibold">Quadrant</th>
+                    {dataSource === "Consolidated" && (
+                      <th className="p-3 text-center font-semibold">Confidence</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -1018,6 +1193,13 @@ const TechExploration = ({ setCurrentPage }) => {
                           <td className="p-3 font-semibold text-gray-700">
                             {getMatrixQuadrant(tech)}
                           </td>
+                          {dataSource === "Consolidated" && (
+                            <td className="p-3 text-center">
+                              <span className="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 border border-yellow-300">
+                                {tech.confidence ? `${(tech.confidence * 100).toFixed(0)}%` : 'N/A'}
+                              </span>
+                            </td>
+                          )}
                         </tr>
                       );
                     })}
@@ -1041,6 +1223,11 @@ const TechExploration = ({ setCurrentPage }) => {
                 real-time. A higher TIS indicates greater strategic value and
                 deployment readiness.
               </p>
+              {dataSource === "Consolidated" && (
+                <p className="text-sm text-teal-700 mt-3 font-semibold">
+                  ⭐ Consolidated dataset shows multi-source consensus with confidence scores
+                </p>
+              )}
             </div>
           </div>
         )}

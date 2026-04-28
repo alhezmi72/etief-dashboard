@@ -1,26 +1,31 @@
-id,name,phase,x,y,trl,impact,barriers,sustainability,strategicFit,category,notes,source
-1,Agentic AI,innovation,15,48,4,9,7,4,8,AI & Automation,Autonomous AI systems with minimal oversight,"Gartner 2024, McKinsey 2025"
-2,Generative AI,trough,42,19,6,9,5,5,7,AI & Automation,Moving past peak hype to ROI focus,Gartner 2024
-3,AI-Augmented Software Engineering,innovation,12,60,5,8,4,3,6,AI & Automation,Revolutionizing developer productivity,Gartner 2024
-4,Multiagent Systems,innovation,8,82,3,9,8,4,9,AI & Automation,Coordinated autonomous AI agents,Gartner 2024
-5,Humanoid Robots,peak,28,13,4,8,9,6,10,Robotics & Physical Systems,Physical AI embodiments entering workplace,"Gartner 2024, McKinsey 2025"
-6,Structural Battery Composites,slope,62,55,5,8,6,2,7,"Energy, Climate & Materials",Weight-bearing energy storage for EVs,WEF 2025
-7,Green Nitrogen Fixation,slope,56,55,4,7,7,1,5,"Energy, Climate & Materials",Sustainable ammonia production,WEF 2025
-8,Generative Watermarking,innovation,11,66,5,7,5,2,6,"Security, Trust & Privacy",AI content authentication,WEF 2025
-9,Engineered Living Therapeutics,slope,53,50,5,9,8,4,4,"Health, Bio & Experience Tech",Programmable microbes for medicine,WEF 2025
-10,Next-Gen Nuclear Energy,slope,66,53,6,9,8,3,6,"Energy, Climate & Materials",Small modular reactors (SMRs),WEF 2025
-11,Osmotic Power Systems,innovation,9,77,3,6,8,2,5,"Energy, Climate & Materials",Salinity gradient energy,WEF 2025
-12,Application-Specific Semiconductors,slope,74,51,7,9,7,5,8,Computing & Infrastructure,Purpose-built chips for AI workloads,McKinsey 2025
-13,Spatial Computing,slope,51,40,6,7,6,4,8,Computing & Infrastructure,AR/VR for enterprise collaboration,"McKinsey 2025, Gartner 2024"
-14,Digital Twin of Customer,trough,45,23,5,7,7,3,7,"Health, Bio & Experience Tech",Virtual customer representation,Gartner 2024
-15,Quantum Computing,trough,39,14,4,9,9,6,6,Computing & Infrastructure,Moving toward practical applications,McKinsey 2025
-16,AI Disease Management,slope,59,56,6,9,6,3,5,"Health, Bio & Experience Tech",Early detection and diagnosis,CB Insights 2025
-17,Liquid-Cooled Data Centers,slope,71,53,7,7,5,2,7,Computing & Infrastructure,Energy-efficient computing,CB Insights 2025
-18,RNA Therapeutics,slope,64,54,6,9,7,3,4,"Health, Bio & Experience Tech",Next-gen mRNA treatments,CB Insights 2025
-19,Cyborg Wealth Advisors,innovation,13,55,5,6,7,3,3,"Health, Bio & Experience Tech",AI-powered investment management,CB Insights 2025
-20,Satellite Constellation Tech,plateau,82,50,8,8,4,6,8,Connectivity & IoT,LEO commercialization,CB Insights 2025
-21,6G Networks,innovation,7,89,2,8,9,5,9,Connectivity & IoT,Next-generation wireless,Gartner 2024
-22,Superapps,slope,78,52,7,7,5,3,6,"Health, Bio & Experience Tech",All-in-one digital platforms,Gartner 2024
-23,GitOps,plateau,88,48,8,6,3,2,5,Computing & Infrastructure,Infrastructure as code standard,Gartner 2024
-24,Machine Customers,innovation,10,73,3,7,8,4,7,AI & Automation,AI agents as purchasing entities,Gartner 2025
-25,Collaborative Sensing,slope,68,54,6,7,6,2,10,Connectivity & IoT,Distributed sensor networks with AI,WEF 2025
+"id","name","phase","x","y","trl","impact","barriers","sustainability","strategicFit","category","notes","source"
+"1","Agentic AI","Peak of Inflated Expectations","24.64","17.30","6","9","7","6","9","AI & Automation","Autonomous AI systems that plan and execute multi-step workflows; 60% expect deployment within 2 years","Gartner 2026"
+"2","Foundation Models","Peak of Inflated Expectations","33.44","10.48","7","9","6","5","8","AI & Automation","Large language models serving as backbone for AI applications; rapid enterprise adoption","McKinsey 2026"
+"3","AI-Native Software Engineering","Peak of Inflated Expectations","30.22","10.79","6","8","7","6","9","AI & Automation","Development platforms using GenAI for code generation and autonomous maintenance","Gartner 2026"
+"4","Synthetic Data Generation","Slope of Enlightenment","52.79","47.20","7","7","5","7","8","AI & Automation","Solving data scarcity for AI training; becoming standard in development lifecycle","Gartner 2026"
+"5","Edge AI","Slope of Enlightenment","58.37","57.88","8","8","6","7","9","AI & Automation","Real-time AI processing at the edge; critical for IoT and autonomous systems","McKinsey 2026"
+"6","Computer Vision for Quality Control","Slope of Enlightenment","68.00","52.00","8","8","5","6","7","AI & Automation","Mature vision systems for industrial applications; proven ROI in manufacturing","McKinsey 2026"
+"7","Predictive Analytics & ML Pipelines","Plateau of Productivity","85.00","48.00","9","8","4","6","8","AI & Automation","Established ML workflows for forecasting and optimization; low risk high returns","Gartner 2026"
+"8","6G Networks","Innovation Trigger","7.90","83.97","3","9","9","6","8","Connectivity & IoT","Next-generation wireless with sub-millisecond latency; research phase","WEF 2026"
+"9","Reconfigurable Intelligent Surfaces","Innovation Trigger","10.95","66.52","4","8","9","7","7","Connectivity & IoT","Advanced connectivity surfaces for signal manipulation and coverage optimization","WEF 2026"
+"10","Satellite IoT (LEO)","Slope of Enlightenment","64.56","56.32","8","8","6","6","9","Connectivity & IoT","Starlink and LEO satellites enabling remote connectivity for logistics and field operations","McKinsey 2026"
+"11","V2X Communication","Slope of Enlightenment","71.09","52.93","8","9","6","8","10","Connectivity & IoT","Vehicle-to-everything for connected and automated vehicles; aligned with QMIC portfolio","QMIC 2026"
+"12","Confidential Computing","Slope of Enlightenment","54.36","51.89","7","8","7","8","9","Security, Trust & Privacy","Protecting data during use in untrusted infrastructure; enabling secure AI","Gartner 2026"
+"13","Quantum-Safe Cryptography","Peak of Inflated Expectations","20.45","27.20","5","9","8","7","8","Security, Trust & Privacy","Post-quantum encryption standards; preparing for quantum computing threats","McKinsey 2026"
+"14","Zero Trust Architecture","Plateau of Productivity","82.42","47.98","9","8","5","7","9","Security, Trust & Privacy","Security model assuming breach; mature implementation across enterprises","Gartner 2026"
+"15","Federated Learning","Slope of Enlightenment","51.57","43.30","7","7","6","9","8","Security, Trust & Privacy","Privacy-preserving ML training across distributed data; healthcare and finance adoption","WEF 2026"
+"16","Green Hydrogen Production","Slope of Enlightenment","62.64","57.36","7","9","7","10","8","Energy, Climate & Materials","Renewable hydrogen for industrial decarbonization; scaling infrastructure","WEF 2026"
+"17","Next-Gen Battery Storage","Slope of Enlightenment","68.74","53.45","8","9","6","9","7","Energy, Climate & Materials","Flexible batteries and grid-scale storage; enabling renewable reliability","WEF 2026"
+"18","Carbon Capture & Utilization","Trough of Disillusionment","44.51","23.24","6","8","8","10","7","Energy, Climate & Materials","Technologies to capture and repurpose CO2; economic viability challenges","WEF 2026"
+"19","Smart Grid 2.0","Plateau of Productivity","87.83","46.42","9","8","5","9","8","Energy, Climate & Materials","AI-optimized energy distribution with renewable integration; operational at scale","McKinsey 2026"
+"20","Application-Specific Semiconductors","Peak of Inflated Expectations","23.07","21.21","6","8","7","6","8","Computing & Infrastructure","Custom chips for AI workloads; rapid growth in specialized silicon","McKinsey 2026"
+"21","Cloud 3.0 (Hybrid Multi-Cloud)","Plateau of Productivity","80.00","49.00","9","8","5","6","9","Computing & Infrastructure","Diversified cloud architectures for AI scalability and resilience; enterprise standard","Capgemini 2026"
+"22","Distributed Edge Computing","Slope of Enlightenment","60.72","58.14","8","8","6","7","9","Computing & Infrastructure","Processing at network edge for low-latency applications; $300B market by 2026","McKinsey 2026"
+"23","Quantum Computing (NISQ)","Trough of Disillusionment","41.63","18.82","5","9","9","6","7","Quantum Technologies","Noisy intermediate-scale quantum for optimization problems; limited practical applications","WEF 2026"
+"24","Quantum Sensing","Innovation Trigger","9.38","76.16","4","8","9","7","8","Quantum Technologies","Ultra-precise sensors for navigation and medical imaging; early development","WEF 2026"
+"25","Humanoid Robots","Peak of Inflated Expectations","27.25","12.61","6","8","8","6","8","Robotics & Physical Systems","General-purpose robots for warehouses and factories; Tesla Optimus and competitors","WEF 2026"
+"26","Autonomous Mobile Robots","Slope of Enlightenment","66.47","55.02","8","8","6","7","9","Robotics & Physical Systems","AGVs and AMRs for logistics; Amazon deployed 1M+ robots coordinated by AI","McKinsey 2026"
+"27","Autonomous Vehicles L4/L5","Trough of Disillusionment","47.47","30.28","6","9","9","8","10","Robotics & Physical Systems","Fully autonomous driving for limited domains; regulatory and safety challenges","QMIC 2026"
+"28","AI-Enabled Drug Discovery","Slope of Enlightenment","56.28","55.80","7","9","6","8","6","Health, Bio & Experience Tech","ML models for molecule design and clinical trial optimization; accelerating pharma R&D","CB Insights 2026"
+"29","Gene Editing (CRISPR)","Slope of Enlightenment","73.18","51.63","8","9","8","7","5","Health, Bio & Experience Tech","Precision genetic modification for disease treatment; regulatory approvals advancing","WEF 2026"
+"30","AI-Powered Traffic Management","Plateau of Productivity","90.79","45.64","9","8","4","8","10","AI & Automation","Real-time traffic optimization and incident detection; aligned with QMIC Wamd platform","QMIC 2026"

@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-
-import TechAssessment from "./components/TechAssessment.jsx";
 import LandingPage from "./components/LandingPage.jsx";
-import TechExploration from "./components/TechExploration.jsx";  
+import TechExploration from "./components/TechExploration.jsx";
 
 // Main App Component
 const App = () => {
@@ -12,9 +10,6 @@ const App = () => {
     <div>
       {currentPage === "landing" && (
         <LandingPage setCurrentPage={setCurrentPage} />
-      )}
-      {currentPage === "assessment" && (
-        <TechAssessment setCurrentPage={setCurrentPage} />
       )}
       {currentPage === "exploration" && (
         <TechExploration setCurrentPage={setCurrentPage} />

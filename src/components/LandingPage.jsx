@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ChevronRight,
   Target,
@@ -10,11 +10,111 @@ import {
   ExternalLink,
   PieChart,
   Wrench,
+  BarChart3,
 } from "lucide-react";
+import {
+  consolidateDatasets,
+  ConsolidatedDatasetPreview,
+} from "./DatasetConsolidation";
+
 import HypeCyclePreview from "./HypeCyclePreview";
 
 const LandingPage = ({ setCurrentPage }) => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [datasets, setDatasets] = useState([]);
+  const [consolidatedData, setConsolidatedData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadAllDatasets();
+  }, []);
+
+  const loadAllDatasets = async () => {
+    try {
+      setLoading(true);
+
+      // Load all CSV files from Exploration folder
+      const [claudeData, chatgptData, geminiData, deepseekData] =
+        await Promise.all([
+          loadCSV("./data/Exploration/Claude.csv"),
+          loadCSV("./data/Exploration/ChatGPT.csv"),
+          loadCSV("./data/Exploration/Gemini.csv"),
+          loadCSV("./data/Exploration/DeepSeek.csv"),
+        ]);
+
+      const datasetsArray = [claudeData, chatgptData, geminiData, deepseekData];
+      setDatasets(datasetsArray);
+
+      // Generate consolidated dataset
+      const consolidated = consolidateDatasets(datasetsArray);
+      setConsolidatedData(consolidated);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error loading datasets:", error);
+      setLoading(false);
+    }
+  };
+
+  const loadCSV = async (filepath) => {
+    const response = await fetch(filepath);
+    const text = await response.text();
+    return parseCSV(text);
+  };
+
+  const parseCSV = (text) => {
+    const lines = text.split("\n").filter((line) => line.trim());
+    if (lines.length === 0) return [];
+
+    const headers = lines[0]
+      .split(",")
+      .map((h) => h.trim().replace(/^"|"$/g, ""));
+
+    return lines
+      .slice(1)
+      .map((line) => {
+        const values = [];
+        let current = "";
+        let inQuotes = false;
+
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === "," && !inQuotes) {
+            values.push(current.trim().replace(/^"|"$/g, ""));
+            current = "";
+          } else {
+            current += char;
+          }
+        }
+        values.push(current.trim().replace(/^"|"$/g, ""));
+
+        const obj = {};
+        headers.forEach((header, index) => {
+          const value = values[index];
+          // Parse numeric fields
+          if (
+            [
+              "id",
+              "x",
+              "y",
+              "trl",
+              "impact",
+              "barriers",
+              "sustainability",
+              "strategicFit",
+            ].includes(header)
+          ) {
+            obj[header] = parseFloat(value) || 0;
+          } else {
+            obj[header] = value || "";
+          }
+        });
+        return obj;
+      })
+      .filter((obj) => obj.name);
+  };
 
   const motivations = [
     {
@@ -81,6 +181,170 @@ const LandingPage = ({ setCurrentPage }) => {
       <p className="text-sm">{desc}</p>
     </div>
   );
+
+  // Hype Cycle Component for Header
+  const HypeCycleVisualization = ({ technologies }) => {
+    const [clickedTech, setClickedTech] = React.useState(null);
+
+    const phases = [
+      { name: "Innovation Trigger", x: 0, width: 20 },
+      { name: "Peak of Inflated Expectations", x: 20, width: 15 },
+      { name: "Trough of Disillusionment", x: 35, width: 15 },
+      { name: "Slope of Enlightenment", x: 50, width: 25 },
+      { name: "Plateau of Productivity", x: 75, width: 25 },
+    ];
+
+    const hypeCurvePath =
+      "M 50,400 Q 150,100 250,50 Q 350,20 450,150 Q 500,250 550,230 Q 700,200 850,180";
+
+    const CATEGORY_PALETTE = [
+      { fill: "#4f46e5", stroke: "#312e81" }, // indigo
+      { fill: "#0891b2", stroke: "#155e75" }, // cyan
+      { fill: "#16a34a", stroke: "#14532d" }, // green
+      { fill: "#ea580c", stroke: "#7c2d12" }, // orange
+      { fill: "#9333ea", stroke: "#581c87" }, // purple
+      { fill: "#db2777", stroke: "#831843" }, // pink
+      { fill: "#ca8a04", stroke: "#713f12" }, // yellow
+      { fill: "#0f766e", stroke: "#134e4a" }, // teal
+      { fill: "#dc2626", stroke: "#7f1d1d" }, // red
+      { fill: "#2563eb", stroke: "#1e3a8a" }, // blue
+    ];
+
+    const catList = Array.from(
+      new Set(technologies.map((t) => t.category).filter(Boolean)),
+    ).sort();
+
+    const getCategoryColor = (cat) =>
+      CATEGORY_PALETTE[catList.indexOf(cat) % CATEGORY_PALETTE.length] ||
+      CATEGORY_PALETTE[0];
+
+    const handleTechClick = (tech) => {
+      if (clickedTech?.id === tech.id) {
+        setClickedTech(null);
+      } else {
+        setClickedTech(tech);
+      }
+    };
+
+    return (
+      <div className="w-full h-full bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 relative">
+        <svg
+          viewBox="0 0 900 450"
+          className="w-full h-full"
+          style={{ minHeight: "350px" }}
+        >
+          <defs>
+            <pattern
+              id="grid-header"
+              width="50"
+              height="50"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M 50 0 L 0 0 0 50"
+                fill="none"
+                stroke="rgba(255, 255, 255, 0.1)"
+                strokeWidth="1"
+              />
+            </pattern>
+          </defs>
+          <rect width="900" height="450" fill="url(#grid-header)" />
+
+          <path
+            d={hypeCurvePath}
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth="4"
+            opacity="0.8"
+          />
+
+          {phases.map((phase, i) => (
+            <g key={i}>
+              <rect
+                x={phase.x * 9}
+                y="420"
+                width={phase.width * 9}
+                height="30"
+                fill="rgba(255, 255, 255, 0.1)"
+                stroke="rgba(255, 255, 255, 0.3)"
+                strokeWidth="1"
+              />
+              <text
+                x={phase.x * 9 + (phase.width * 9) / 2}
+                y="437"
+                textAnchor="middle"
+                className="text-[9px] font-semibold fill-white"
+              >
+                {phase.name}
+              </text>
+            </g>
+          ))}
+
+          {technologies.map((tech) => {
+            const col = getCategoryColor(tech.category);
+            const isClicked = clickedTech?.id === tech.id;
+            return (
+              <g
+                key={tech.id}
+                onClick={() => handleTechClick(tech)}
+                className="cursor-pointer"
+              >
+                {isClicked && (
+                  <circle
+                    cx={tech.x * 9}
+                    cy={tech.y * 4}
+                    r={10}
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="2"
+                    opacity="0.6"
+                  />
+                )}
+                <circle
+                  cx={tech.x * 9}
+                  cy={tech.y * 4}
+                  r={isClicked ? 7 : 6}
+                  fill={col.fill}
+                  stroke="#ffffff"
+                  strokeWidth={isClicked ? 2 : 1.5}
+                  opacity="0.9"
+                />
+              </g>
+            );
+          })}
+        </svg>
+
+        {/* Technology details tooltip - shown outside SVG */}
+        {clickedTech && (
+          <div
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
+            style={{ minWidth: 200 }}
+          >
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-4 py-3 shadow-xl text-center">
+              <p className="text-white font-bold text-sm leading-tight">
+                {clickedTech.name}
+              </p>
+              {clickedTech.trl != null && (
+                <p className="text-indigo-200 text-[10px] mt-1">
+                  TRL: {clickedTech.trl}/9
+                </p>
+              )}
+              {clickedTech.impact != null && (
+                <p className="text-indigo-200 text-[10px]">
+                  Impact: {clickedTech.impact}/10
+                </p>
+              )}
+              {clickedTech.category && (
+                <p className="text-indigo-200 text-[10px]">
+                  {clickedTech.category}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const renderOverview = () => (
     <div className="space-y-12">
@@ -170,6 +434,58 @@ const LandingPage = ({ setCurrentPage }) => {
         </div>
       </section>
       <div>{renderTools()}</div>
+    </div>
+  );
+
+  const renderConsolidatedSummary = () => (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-500 to-amber-600 flex items-center justify-center">
+          <BarChart3 className="w-7 h-7 text-white" />
+        </div>
+        <h2 className="text-3xl font-bold text-gray-900">
+          Consolidated Technology Portfolio
+        </h2>
+      </div>
+     
+        <div className="bg-gradient-to-r from-yellow-50 to-amber-50 p-6 rounded-lg border-l-4 border-yellow-500">
+          <p className="text-gray-700 text-lg">
+            Multi-source consensus analysis integrating insights from{" "}
+            <strong className="text-yellow-700">
+              Claude, ChatGPT, Gemini, and DeepSeek
+            </strong>{" "}
+            to provide a comprehensive view of emerging technologies in 2026.
+          </p>
+    
+        
+      </div>
+
+      {consolidatedData ? (
+        <ConsolidatedDatasetPreview datasets={datasets} />
+      ) : (
+        <div className="bg-white rounded-xl shadow-lg p-12 text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-teal-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading consolidated analysis...</p>
+        </div>
+      )}
+      <section className="bg-white p-8 rounded-lg shadow-md border-l-4 border-indigo-500">
+      <h2 className="text-2xl font-bold mb-6 text-gray-900">Framework Tools</h2>
+      
+      <div className="grid gap-6">
+        <button
+          onClick={() => setCurrentPage("exploration")}
+          className="group block p-6 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg shadow-md hover:shadow-xl transition-all hover:-translate-y-1 text-white text-left border-none cursor-pointer"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xl font-bold">Technology Exploration</h3>
+            <ExternalLink className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+          </div>
+          <p className="text-teal-50">
+            Explore emerging technologies with interactive visualizations and multi-source insights from leading AI models
+          </p>
+        </button>
+      </div>
+    </section>
     </div>
   );
 
@@ -771,7 +1087,7 @@ const LandingPage = ({ setCurrentPage }) => {
     { id: "stage3", label: "Stage 3", icon: Map },
     { id: "stage4", label: "Stage 4", icon: Activity },
     { id: "report", label: "Risk Report", icon: PieChart },
-    // { id: "tools", label: "Framework Tools", icon: Wrench },
+    { id: "portfolio", label: "Consolidated Portfolio", icon: BarChart3 },
   ];
 
   const renderTools = () => (
@@ -780,10 +1096,10 @@ const LandingPage = ({ setCurrentPage }) => {
       <p className="text-gray-700 mb-6">
         Explore our interactive tools to apply this framework:
       </p>
-      <div className="grid md:grid-cols-2 gap-6">
+      <div>
         <button
           onClick={() => setCurrentPage("exploration")}
-          className="group block p-6 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg shadow-md hover:shadow-xl transition-all hover:-translate-y-1 text-white text-left border-none cursor-pointer"
+          className="group block p-6 bg-gradient-to-br from-teal-500 to-teal-600 rounded-lg shadow-md hover:shadow-xl transition-all hover:-translate-y-1 text-white text-left border-none cursor-pointer w-full"
         >
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xl font-bold">Technology Exploration</h3>
@@ -791,19 +1107,7 @@ const LandingPage = ({ setCurrentPage }) => {
           </div>
           <p className="text-teal-50">
             Explore emerging technologies via various Machine Learning Language
-            models
-          </p>
-        </button>
-        <button
-          onClick={() => setCurrentPage("assessment")}
-          className="group block p-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md hover:shadow-xl transition-all hover:-translate-y-1 text-white text-left border-none cursor-pointer"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xl font-bold">Technology Assessment</h3>
-            <ExternalLink className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-          </div>
-          <p className="text-blue-50">
-            Assess and evaluate a list of emerging technologies
+            models with consolidated multi-source analysis
           </p>
         </button>
       </div>
@@ -835,15 +1139,15 @@ const LandingPage = ({ setCurrentPage }) => {
               </p>
               <div className="mt-10 flex flex-wrap gap-4">
                 <button
-                  onClick={() => setActiveTab("tools")}
+                  onClick={() => setCurrentPage("exploration")}
                   className="bg-white text-white px-8 py-4 rounded-full font-bold text-sm shadow-xl hover:bg-indigo-50 transition-all duration-300 hover:scale-105 inline-flex items-center gap-2.5 group"
                   style={{
                     background:
                       "linear-gradient(135deg, #3a70cd 0%, #4f46e5 100%)",
                   }}
                 >
-                  <Wrench className="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" />
-                  <span className="leading-tight">Framework Tools</span>
+                  <Wrench className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
+                  <span className="leading-tight">Technology Exploration Tools</span>
                 </button>
               </div>
             </div>
@@ -893,6 +1197,7 @@ const LandingPage = ({ setCurrentPage }) => {
 
       <main className="max-w-7xl mx-auto px-6 py-12">
         {activeTab === "overview" && renderOverview()}
+        {activeTab === "portfolio" && renderConsolidatedSummary()}
         {activeTab === "stage1" && renderStage1()}
         {activeTab === "stage2" && renderStage2()}
         {activeTab === "stage3" && renderStage3()}

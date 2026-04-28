@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emerging Technology Exploration Framework - Presentation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      overflow: hidden;
+    }
+
+    .presentation {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    .slide {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .slide.prev {
+      transform: translateX(-100%);
+    }
+
+    .slide-content {
+      background: white;
+      border-radius: 20px;
+      padding: 60px;
+      max-width: 1200px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    h1 {
+      color: #4839cc;
+      font-size: 3.5em;
+      margin-bottom: 20px;
+      font-weight: 900;
+    }
+
+    h2 {
+      color: #4839cc;
+      font-size: 2.5em;
+      margin-bottom: 30px;
+      font-weight: 700;
+    }
+
+    h3 {
+      color: #0891b2;
+      font-size: 1.8em;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    p, li {
+      color: #374151;
+      font-size: 1.2em;
+      line-height: 1.8;
+      margin-bottom: 15px;
+    }
+
+    ul {
+      margin-left: 30px;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      font-size: 1.5em;
+      margin-bottom: 40px;
+    }
+
+    .controls {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      z-index: 1000;
+    }
+
+    button {
+      background: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 50px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s;
+      color: #4839cc;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .slide-counter {
+      position: fixed;
+      top: 40px;
+      right: 40px;
+      background: white;
+      padding: 15px 25px;
+      border-radius: 50px;
+      font-weight: 600;
+      color: #4839cc;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+
+    .stage-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .stage-card {
+      background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+      padding: 25px;
+      border-radius: 15px;
+      color: white;
+    }
+
+    .stage-card h4 {
+      color: white;
+      font-size: 1.4em;
+      margin-bottom: 10px;
+    }
+
+    .stage-card p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1em;
+    }
+
+    .result-box {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-left: 5px solid #0891b2;
+      padding: 25px;
+      border-radius: 10px;
+      margin: 20px 0;
+    }
+
+    .result-box strong {
+      color: #0891b2;
+      font-size: 1.3em;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .metric-card {
+      background: linear-gradient(135deg, #4839cc 0%, #667eea 100%);
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      color: white;
+    }
+
+    .metric-card .number {
+      font-size: 3em;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .metric-card .label {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .title-slide {
+      text-align: center;
+    }
+
+    .title-slide h1 {
+      font-size: 4em;
+      margin-bottom: 30px;
+    }
+
+    .title-slide .org {
+      color: #667eea;
+      font-size: 1.8em;
+      margin-top: 40px;
+      font-weight: 600;
+    }
+
+    .phase-distribution {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .phase-bar {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .phase-label {
+      width: 200px;
+      font-weight: 600;
+      color: #374151;
+      font-size: 1em;
+    }
+
+    .phase-track {
+      flex: 1;
+      height: 40px;
+      background: #e5e7eb;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .phase-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0891b2 0%, #0e7490 100%);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 15px;
+      color: white;
+      font-weight: 700;
+      transition: width 1s ease-out;
+    }
+
+    .highlight {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      padding: 5px 10px;
+      border-radius: 5px;
+      color: #92400e;
+      font-weight: 600;
+    }
+
+    .key-finding {
+      background: white;
+      border: 3px solid #0891b2;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 15px 0;
+    }
+
+    .key-finding h4 {
+      color: #0891b2;
+      margin-bottom: 10px;
+      font-size: 1.3em;
+    }
+  </style>
+</head>
+<body>
+  <div class="presentation">
+    <!-- Slide 1: Title -->
+    <div class="slide active">
+      <div class="slide-content title-slide">
+        <h1>Emerging Technology Exploration & Estimation Framework</h1>
+        <p class="subtitle">A Systematic Approach to Technology Intelligence</p>
+        <div style="margin-top: 60px;">
+          <p style="font-size: 1.3em; color: #6b7280;">Multi-source AI-driven consensus analysis for strategic technology foresight</p>
+        </div>
+        <p class="org">Qatar Mobility Innovations Center (QMIC)</p>
+      </div>
+    </div>
+
+    <!-- Slide 2: Challenge & Opportunity -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>The Challenge</h2>
+        <div class="result-box">
+          <p><strong>Organizations face critical decisions:</strong></p>
+          <ul>
+            <li>Which emerging technologies to invest in?</li>
+            <li>When to adopt new innovations?</li>
+            <li>How to balance risk and opportunity?</li>
+            <li>Which technologies align with strategic goals?</li>
+          </ul>
+        </div>
+        <h3>Traditional Approaches Fall Short</h3>
+        <ul>
+          <li>📊 Reliance on single-source analysis</li>
+          <li>⏰ Time-consuming manual research</li>
+          <li>🎯 Lack of systematic evaluation criteria</li>
+          <li>❌ Missing strategic alignment assessment</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 3: Framework Overview -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>Framework Approach</h2>
+        <p class="subtitle">4-Stage Systematic Methodology</p>
+        <div class="stage-grid">
+          <div class="stage-card">
+            <h4>🔍 Stage 1: Scanning</h4>
+            <p>Multi-source technology identification via Claude, ChatGPT, Gemini, and DeepSeek</p>
+          </div>
+          <div class="stage-card">
+            <h4>📊 Stage 2: Assessment</h4>
+            <p>Weighted scoring across 5 dimensions: TRL, Impact, Strategic Fit, Barriers, Sustainability</p>
+          </div>
+          <div class="stage-card">
+            <h4>🎯 Stage 3: Prioritization</h4>
+            <p>Portfolio matrix classification and roadmapping across time horizons</p>
+          </div>
+          <div class="stage-card">
+            <h4>⚡ Stage 4: Action</h4>
+            <p>Implementation planning with KPIs and continuous monitoring</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: Innovation - Data Consolidation -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>Key Innovation: Multi-Source Consolidation</h2>
+        <h3>Leveraging AI Diversity for Consensus</h3>
+        <div class="result-box">
+          <p><strong>Method:</strong> Aggregate insights from 4 leading AI models</p>
+          <ul>
+            <li>Claude (Anthropic) - analytical depth</li>
+            <li>ChatGPT (OpenAI) - broad knowledge</li>
+            <li>Gemini (Google) - multimodal integration</li>
+            <li>DeepSeek - specialized technical analysis</li>
+          </ul>
+        </div>
+        <h3>Consolidation Algorithm</h3>
+        <ul>
+          <li>✅ Technology name normalization & deduplication</li>
+          <li>✅ Cross-source TIS (Tech Impact Score) calculation</li>
+          <li>✅ Confidence scoring based on consensus</li>
+          <li>✅ Phase-balanced selection across Gartner Hype Cycle</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 5: Assessment Framework -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>Assessment Methodology</h2>
+        <h3>Tech Impact Score (TIS) Formula</h3>
+        <div class="result-box">
+          <p><strong>TIS = 0.35×Impact + 0.30×Strategic Fit + 0.20×(10-Barriers) + 0.15×(10-Sustainability)</strong></p>
+        </div>
+        <h3>Five Evaluation Dimensions</h3>
+        <ul>
+          <li><strong>Technology Maturity (TRL):</strong> Readiness level 1-9</li>
+          <li><strong>Business Impact:</strong> Revenue growth, cost reduction potential</li>
+          <li><strong>Strategic Fit:</strong> Alignment with QMIC vision & mission</li>
+          <li><strong>Adoption Barriers:</strong> Regulatory, skills, infrastructure challenges</li>
+          <li><strong>Sustainability:</strong> ESG impact, circular economy potential</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 6: Main Results - Portfolio -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>Main Results: Consolidated Portfolio</h2>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <div class="number">30</div>
+            <div class="label">Technologies Identified</div>
+          </div>
+          <div class="metric-card">
+            <div class="number">8</div>
+            <div class="label">Technology Categories</div>
+          </div>
+          <div class="metric-card">
+            <div class="number">0.87</div>
+            <div class="label">Avg. Confidence Score</div>
+          </div>
+        </div>
+        <h3 style="margin-top: 40px;">Technology Categories</h3>
+        <ul>
+          <li>AI & Automation</li>
+          <li>Connectivity & IoT</li>
+          <li>Security, Trust & Privacy</li>
+          <li>Energy, Climate & Materials</li>
+          <li>Computing & Infrastructure</li>
+          <li>Quantum Technologies</li>
+          <li>Robotics & Physical Systems</li>
+          <li>Health, Bio & Experience Tech</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 7: Hype Cycle Distribution -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>Gartner Hype Cycle Distribution</h2>
+        <p class="subtitle">Balanced across all maturity phases</p>
+        <div class="phase-distribution">
+          <div class="phase-bar">
+            <div class="phase-label">Innovation Trigger</div>
+            <div class="phase-track">
+              <div class="phase-fill" style="width: 20%">6</div>
+            </div>
+          </div>
+          <div class="phase-bar">
+            <div class="phase-label">Peak of Inflated Expectations</div>
+            <div class="phase-track">
+              <div class="phase-fill" style="width: 20%">6</div>
+            </div>
+          </div>
+          <div class="phase-bar">
+            <div class="phase-label">Trough of Disillusionment</div>
+            <div class="phase-track">
+              <div class="phase-fill" style="width: 20%">6</div>
+            </div>
+          </div>
+          <div class="phase-bar">
+            <div class="phase-label">Slope of Enlightenment</div>
+            <div class="phase-track">
+              <div class="phase-fill" style="width: 20%">6</div>
+            </div>
+          </div>
+          <div class="phase-bar">
+            <div class="phase-label">Plateau of Productivity</div>
+            <div class="phase-track">
+              <div class="phase-fill" style="width: 20%">6</div>
+            </div>
+          </div>
+        </div>
+        <div class="result-box" style="margin-top: 30px;">
+          <p><strong>Achievement:</strong> Even distribution ensures comprehensive view across entire technology lifecycle</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: Top Technologies -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>Top 10 High-Impact Technologies</h2>
+        <p class="subtitle">Ranked by Tech Impact Score (TIS)</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+          <div class="key-finding">
+            <h4>1. Agentic AI</h4>
+            <p>TIS: 8.5 | High strategic fit for automation</p>
+          </div>
+          <div class="key-finding">
+            <h4>2. Edge AI & Federated Learning</h4>
+            <p>TIS: 8.2 | Critical for IoT applications</p>
+          </div>
+          <div class="key-finding">
+            <h4>3. V2X Communication</h4>
+            <p>TIS: 8.8 | Perfect alignment with QMIC mobility focus</p>
+          </div>
+          <div class="key-finding">
+            <h4>4. Zero Trust Architecture</h4>
+            <p>TIS: 8.1 | Mature security framework</p>
+          </div>
+          <div class="key-finding">
+            <h4>5. Green Hydrogen Production</h4>
+            <p>TIS: 8.3 | High sustainability impact</p>
+          </div>
+          <div class="key-finding">
+            <h4>6. Next-Gen Battery Storage</h4>
+            <p>TIS: 8.4 | Enabling renewable transition</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: Strategic Insights -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>Strategic Insights</h2>
+        <h3>Quick Wins (High Impact, Near-term)</h3>
+        <div class="result-box">
+          <ul>
+            <li>Zero Trust Architecture (TRL 9)</li>
+            <li>Predictive Analytics & ML Pipelines (TRL 9)</li>
+            <li>Fleet Telematics AI (TRL 9) - <span class="highlight">QMIC aligned</span></li>
+          </ul>
+        </div>
+        
+        <h3>Strategic Bets (High Impact, Long-term)</h3>
+        <div class="result-box">
+          <ul>
+            <li>Agentic AI (TRL 6)</li>
+            <li>Quantum-Safe Cryptography (TRL 5)</li>
+            <li>Autonomous Vehicles L4/L5 (TRL 6) - <span class="highlight">QMIC aligned</span></li>
+          </ul>
+        </div>
+
+        <h3>Key Recommendation</h3>
+        <div class="key-finding">
+          <h4>Balanced Portfolio Approach</h4>
+          <p>30% Quick Wins | 40% Strategic Bets | 20% Incremental | 10% Exploratory</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 10: QMIC Alignment -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>QMIC Strategic Alignment</h2>
+        <h3>Technologies with Strategic Fit ≥ 9/10</h3>
+        <div class="key-finding">
+          <h4>🚗 Mobility & Transportation</h4>
+          <ul>
+            <li>V2X Communication - Connected vehicle infrastructure</li>
+            <li>Autonomous Vehicles L4/L5 - Next-gen mobility</li>
+            <li>AI-Powered Traffic Management - Smart city optimization</li>
+            <li>Fleet Telematics AI - Connected fleet solutions</li>
+          </ul>
+        </div>
+        <div class="key-finding">
+          <h4>🌆 Smart City & IoT</h4>
+          <ul>
+            <li>Video Analytics for Smart Cities - Urban monitoring</li>
+            <li>Environmental Monitoring IoT - Air quality tracking</li>
+            <li>Industrial IoT Platforms - Predictive maintenance</li>
+          </ul>
+        </div>
+        <div class="result-box">
+          <p><strong>Result:</strong> <span class="highlight">23% of portfolio</span> directly aligned with QMIC's core mission</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 11: Framework Value -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>Framework Value Proposition</h2>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <div class="number">4×</div>
+            <div class="label">Data Sources Consolidated</div>
+          </div>
+          <div class="metric-card">
+            <div class="number">5</div>
+            <div class="label">Evaluation Dimensions</div>
+          </div>
+          <div class="metric-card">
+            <div class="number">100%</div>
+            <div class="label">Hype Cycle Coverage</div>
+          </div>
+        </div>
+        <h3 style="margin-top: 40px;">Key Benefits</h3>
+        <ul>
+          <li>✅ <strong>Reduced Bias:</strong> Multi-source consensus minimizes single-model limitations</li>
+          <li>✅ <strong>Enhanced Confidence:</strong> Statistical validation across AI sources</li>
+          <li>✅ <strong>Strategic Clarity:</strong> Clear alignment with organizational objectives</li>
+          <li>✅ <strong>Actionable Roadmap:</strong> Phased implementation across 1-5 year horizons</li>
+          <li>✅ <strong>Continuous Intelligence:</strong> Framework enables quarterly updates</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slide 12: Implementation Roadmap -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>Implementation Roadmap</h2>
+        <h3>Short-term (1 Year)</h3>
+        <div class="result-box">
+          <ul>
+            <li>Deploy Quick Win technologies (TRL ≥ 7)</li>
+            <li>Pilot Strategic Bets in controlled environments</li>
+            <li>Establish governance framework & KPIs</li>
+          </ul>
+        </div>
+        
+        <h3>Mid-term (2-3 Years)</h3>
+        <div class="result-box">
+          <ul>
+            <li>Scale successful pilots to production</li>
+            <li>Build internal capability & expertise</li>
+            <li>Form strategic partnerships with innovators</li>
+          </ul>
+        </div>
+
+        <h3>Long-term (5+ Years)</h3>
+        <div class="result-box">
+          <ul>
+            <li>Invest in transformative innovations</li>
+            <li>Lead in selected technology domains</li>
+            <li>Continuous radar updates & portfolio rebalancing</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 13: Conclusion -->
+    <div class="slide">
+      <div class="slide-content">
+        <h2>Conclusion</h2>
+        <div class="key-finding">
+          <h4>Framework Achievements</h4>
+          <ul>
+            <li>Systematic identification of 30 high-impact technologies</li>
+            <li>Multi-source AI consensus with 87% average confidence</li>
+            <li>Balanced portfolio across all maturity phases</li>
+            <li>Strong alignment with QMIC strategic objectives</li>
+          </ul>
+        </div>
+        <h3>Next Steps</h3>
+        <div class="result-box">
+          <ul>
+            <li>🎯 Establish Emerging Technology Board (ETB)</li>
+            <li>🎯 Create Technology Intelligence Unit</li>
+            <li>🎯 Launch pilot projects for Quick Wins</li>
+            <li>🎯 Quarterly framework updates with latest data</li>
+          </ul>
+        </div>
+        <div style="text-align: center; margin-top: 40px;">
+          <p style="font-size: 1.5em; color: #4839cc; font-weight: 700;">
+            From Technology Insight to Strategic Action
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 14: Thank You -->
+    <div class="slide">
+      <div class="slide-content title-slide">
+        <h1>Thank You</h1>
+        <p class="subtitle">Questions & Discussion</p>
+        <div style="margin-top: 60px;">
+          <p style="font-size: 1.3em; color: #6b7280;">Emerging Technology Exploration Framework</p>
+          <p style="font-size: 1.1em; color: #9ca3af; margin-top: 20px;">Enabling Smart & Safe Living through Innovation</p>
+        </div>
+        <p class="org">Qatar Mobility Innovations Center (QMIC)</p>
+        <div style="margin-top: 40px; font-size: 1em; color: #6b7280;">
+          <p>Framework Tools: www.qmic.com/tech-exploration</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-counter">
+    <span id="currentSlide">1</span> / <span id="totalSlides">14</span>
+  </div>
+
+  <div class="controls">
+    <button id="prevBtn" onclick="previousSlide()">← Previous</button>
+    <button id="nextBtn" onclick="nextSlide()">Next →</button>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    
+    document.getElementById('totalSlides').textContent = totalSlides;
+
+    function showSlide(n) {
+      slides[currentSlide].classList.remove('active');
+      slides[currentSlide].classList.add('prev');
+      
+      currentSlide = n;
+      
+      if (currentSlide >= totalSlides) {
+        currentSlide = totalSlides - 1;
+      }
+      if (currentSlide < 0) {
+        currentSlide = 0;
+      }
+      
+      slides.forEach(slide => {
+        slide.classList.remove('active', 'prev');
+      });
+      
+      slides[currentSlide].classList.add('active');
+      document.getElementById('currentSlide').textContent = currentSlide + 1;
+      
+      updateButtons();
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        showSlide(currentSlide + 1);
+      }
+    }
+
+    function previousSlide() {
+      if (currentSlide > 0) {
+        showSlide(currentSlide - 1);
+      }
+    }
+
+    function updateButtons() {
+      document.getElementById('prevBtn').disabled = currentSlide === 0;
+      document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        previousSlide();
+      }
+    });
+
+    // Initialize
+    updateButtons();
+
+    // Animate phase bars on slide 7
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const fills = entry.target.querySelectorAll('.phase-fill');
+          fills.forEach((fill, index) => {
+            setTimeout(() => {
+              fill.style.width = '20%';
+            }, index * 100);
+          });
+        }
+      });
+    });
+
+    slides.forEach(slide => observer.observe(slide));
+  </script>
+</body>
+</html>
