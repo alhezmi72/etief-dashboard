@@ -316,8 +316,7 @@ const TechExploration = ({ setCurrentPage }) => {
                 Technology Exploration
               </h2>
               <p className="text-xl text-blue-50 max-w-3xl">
-                Explore emerging technologies obtained from various sources, visualize them on a Gartner-style Hype Cycle, and assess their potential impact and strategic fit
-              </p>
+                Explore emerging technologies from leading sources, visualize them on a Gartner-style Hype Cycle, and assess their maturity, impact, and strategic alignment</p>
             </div>
           </div>
           <div className="w-px h-4 bg-[#c7c4d8]/30 my-auto" />
