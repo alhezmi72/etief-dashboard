@@ -30,13 +30,49 @@ const TechExploration = ({ setCurrentPage }) => {
   const [selectedTech, setSelectedTech] = useState(null);
   const [dragging, setDragging] = useState(null);
   const [activeView, setActiveView] = useState("hype");
-  const [weights, setWeights] = useState({
-    trl: 0.3,
-    impact: 0.3,
-    strategicFit: 0.2,
-    barriers: -0.1,
-    sustainability: 0.1,
-  });
+  // Positive criteria weights (must sum to 1.0 among themselves).
+  // "barriers" is kept separate as a standalone penalty magnitude (0–0.5).
+  const DEFAULT_POS_WEIGHTS = { trl: 0.3, impact: 0.3, strategicFit: 0.2, sustainability: 0.2 };
+  const DEFAULT_BARRIERS_WEIGHT = 0.1;
+
+  const [posWeights, setPosWeights] = useState(DEFAULT_POS_WEIGHTS);
+  const [barriersWeight, setBarriersWeight] = useState(DEFAULT_BARRIERS_WEIGHT);
+
+  // Unified weights object used throughout existing code (barriers stays negative)
+  const weights = { ...posWeights, barriers: -barriersWeight };
+
+  // Rebalance positive weights when one slider changes
+  const rebalanceWeights = (baseWeights, updatedKey, newValue) => {
+    const remainingKeys = Object.keys(baseWeights).filter((k) => k !== updatedKey);
+    const remainingTotal = 1 - newValue;
+    const oldRemainingSum = remainingKeys.reduce((sum, k) => sum + baseWeights[k], 0);
+    const newWeights = { ...baseWeights, [updatedKey]: newValue };
+    if (oldRemainingSum > 0) {
+      remainingKeys.forEach((k) => {
+        newWeights[k] = (baseWeights[k] / oldRemainingSum) * remainingTotal;
+      });
+    } else {
+      // Edge case: distribute evenly
+      const even = remainingTotal / remainingKeys.length;
+      remainingKeys.forEach((k) => { newWeights[k] = even; });
+    }
+    return newWeights;
+  };
+
+  const handleWeightChange = (key, newValue) => {
+    if (key === "barriers") {
+      setBarriersWeight(newValue);
+    } else {
+      // Clamp to [0, 1) so at least some weight remains for others
+      const clamped = Math.min(Math.max(newValue, 0), 0.99);
+      setPosWeights(rebalanceWeights(posWeights, key, clamped));
+    }
+  };
+
+  const resetWeights = () => {
+    setPosWeights(DEFAULT_POS_WEIGHTS);
+    setBarriersWeight(DEFAULT_BARRIERS_WEIGHT);
+  };
 
   const [filterCategory, setFilterCategory] = useState("all");
   const [showConsolidated, setShowConsolidated] = useState(false);
@@ -116,13 +152,20 @@ const TechExploration = ({ setCurrentPage }) => {
     if (tech.tis !== undefined) {
       return tech.tis.toFixed(2);
     }
-    
-    const score =
-      tech.trl * weights.trl +
-      tech.impact * weights.impact +
-      tech.strategicFit * weights.strategicFit +
-      (10 - tech.barriers) * Math.abs(weights.barriers) +
-      (10 - tech.sustainability) * weights.sustainability;
+
+    // Positive criteria: each raw value (0–10) weighted by its share.
+    // posWeights sum to 1, so the weighted sum spans 0–10.
+    const positiveScore =
+      tech.trl * posWeights.trl +
+      tech.impact * posWeights.impact +
+      tech.strategicFit * posWeights.strategicFit +
+      (10 - tech.sustainability) * posWeights.sustainability;
+
+    // Barriers penalty: deduct barriersWeight × barriers (higher barriers = lower TIS).
+    // The penalty is scaled so a max-barriers (10) tech loses up to barriersWeight×10 points.
+    const penalty = barriersWeight * tech.barriers;
+
+    const score = positiveScore - penalty;
 
     return Math.max(0, Math.min(10, score)).toFixed(2);
   };
@@ -1006,69 +1049,87 @@ const TechExploration = ({ setCurrentPage }) => {
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <div className="flex items-center gap-2 mb-3">
-                  <Settings size={20} className="text-teal-600" />
-                  <span className="font-semibold text-gray-700">
-                    Weight Controls
-                  </span>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2">
+                    <Settings size={20} className="text-teal-600" />
+                    <span className="font-semibold text-gray-700">Weight Controls</span>
+                    <span className="text-xs text-gray-400">(adjusting one criterion auto-rebalances the others)</span>
+                  </div>
+                  <button
+                    onClick={resetWeights}
+                    className="flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full bg-teal-100 text-teal-700 hover:bg-teal-200 transition-colors"
+                  >
+                    <RefreshCw size={12} /> Reset
+                  </button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 text-sm">
+
+                {/* Positive-criteria sliders — rebalance each other */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm mb-3">
                   {[
-                    { key: "trl", label: "TRL", min: 0, max: 1, step: 0.1 },
-                    {
-                      key: "impact",
-                      label: "Impact",
-                      min: 0,
-                      max: 1,
-                      step: 0.1,
-                    },
-                    {
-                      key: "strategicFit",
-                      label: "Strategic Fit",
-                      min: 0,
-                      max: 1,
-                      step: 0.05,
-                    },
-                    {
-                      key: "barriers",
-                      label: "Barriers",
-                      min: -0.5,
-                      max: 0,
-                      step: 0.05,
-                    },
-                    {
-                      key: "sustainability",
-                      label: "Sustainability",
-                      min: 0,
-                      max: 0.3,
-                      step: 0.05,
-                    },
+                    { key: "trl", label: "TRL" },
+                    { key: "impact", label: "Impact" },
+                    { key: "strategicFit", label: "Strategic Fit" },
+                    { key: "sustainability", label: "Sustainability" },
                   ].map((param) => (
                     <div key={param.key} className="flex flex-col gap-1">
-                      <label className="font-medium text-gray-700 text-xs">
-                        {param.label}
-                      </label>
+                      <div className="flex items-center justify-between">
+                        <label className="font-medium text-gray-700 text-xs">{param.label}</label>
+                        <span className="text-xs font-bold text-teal-600">
+                          {(posWeights[param.key] * 100).toFixed(0)}%
+                        </span>
+                      </div>
                       <div className="flex items-center gap-2">
                         <input
                           type="range"
-                          min={param.min}
-                          max={param.max}
-                          step={param.step}
-                          value={weights[param.key]}
-                          onChange={(e) =>
-                            setWeights({
-                              ...weights,
-                              [param.key]: parseFloat(e.target.value),
-                            })
-                          }
-                          className="w-20"
+                          min={0}
+                          max={0.99}
+                          step={0.01}
+                          value={posWeights[param.key]}
+                          onChange={(e) => handleWeightChange(param.key, parseFloat(e.target.value))}
+                          className="w-full accent-teal-500"
                         />
-                        <span className="text-xs font-semibold text-teal-600 w-8">
-                          {weights[param.key].toFixed(2)}
-                        </span>
+                      </div>
+                      {/* Mini bar showing proportion */}
+                      <div className="h-1.5 rounded-full bg-gray-200 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-teal-400 transition-all duration-200"
+                          style={{ width: `${posWeights[param.key] * 100}%` }}
+                        />
                       </div>
                     </div>
                   ))}
+                </div>
+
+                {/* Barriers penalty slider — independent */}
+                <div className="border-t border-gray-200 pt-3">
+                  <div className="flex flex-col gap-1 max-w-xs">
+                    <div className="flex items-center justify-between">
+                      <label className="font-medium text-gray-700 text-xs">
+                        Barriers Penalty
+                        <span className="ml-1 text-gray-400 font-normal">(independent)</span>
+                      </label>
+                      <span className="text-xs font-bold text-red-500">
+                        -{(barriersWeight * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="range"
+                        min={0}
+                        max={0.5}
+                        step={0.01}
+                        value={barriersWeight}
+                        onChange={(e) => handleWeightChange("barriers", parseFloat(e.target.value))}
+                        className="w-full accent-red-400"
+                      />
+                    </div>
+                    <div className="h-1.5 rounded-full bg-gray-200 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-red-300 transition-all duration-200"
+                        style={{ width: `${(barriersWeight / 0.5) * 100}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1212,11 +1273,11 @@ const TechExploration = ({ setCurrentPage }) => {
                 Tech Impact Score (TIS) Formula:
               </h3>
               <div className="bg-white p-4 rounded border border-gray-300 text-gray-700 font-mono text-sm">
-                TIS = (TRL × {weights.trl.toFixed(2)}) + (Impact ×{" "}
-                {weights.impact.toFixed(2)}) + (Strategic Fit ×{" "}
-                {weights.strategicFit.toFixed(2)}) + ((10 - Barriers) ×{" "}
-                {Math.abs(weights.barriers).toFixed(2)}) + ((10 -
-                Sustainability) × {weights.sustainability.toFixed(2)})
+                TIS = (TRL × {(posWeights.trl * 100).toFixed(0)}%) + (Impact ×{" "}
+                {(posWeights.impact * 100).toFixed(0)}%) + (Strategic Fit ×{" "}
+                {(posWeights.strategicFit * 100).toFixed(0)}%) + (Sustainability ×{" "}
+                {(posWeights.sustainability * 100).toFixed(0)}%) − (Barriers ×{" "}
+                {(barriersWeight * 100).toFixed(0)}%)
               </div>
               <p className="text-sm text-gray-600 mt-3">
                 Adjust the weight controls above to re-score technologies in
