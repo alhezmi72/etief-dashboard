@@ -434,31 +434,31 @@
           <div class="phase-bar">
             <div class="phase-label">Innovation Trigger</div>
             <div class="phase-track">
-              <div class="phase-fill" style="width:27%">8</div>
+              <div class="phase-fill" data-count="8">8</div>
             </div>
           </div>
           <div class="phase-bar">
             <div class="phase-label">Peak of Inflated Expectations</div>
             <div class="phase-track">
-              <div class="phase-fill" style="width: 16%">5</div>
+              <div class="phase-fill" data-count="5">5</div>
             </div>
           </div>
           <div class="phase-bar">
             <div class="phase-label">Trough of Disillusionment</div>
             <div class="phase-track">
-              <div class="phase-fill" style="width: 16%">5</div>
+              <div class="phase-fill" data-count="5">5</div>
             </div>
           </div>
           <div class="phase-bar">
             <div class="phase-label">Slope of Enlightenment</div>
             <div class="phase-track">
-              <div class="phase-fill" style="width: 23%">7</div>
+              <div class="phase-fill" data-count="7">7</div>
             </div>
           </div>
           <div class="phase-bar">
             <div class="phase-label">Plateau of Productivity</div>
             <div class="phase-track">
-              <div class="phase-fill" style="width: 16%">5</div>
+              <div class="phase-fill" data-count="5">5</div>
             </div>
           </div>
         </div>
@@ -737,14 +737,20 @@
     // Initialize
     updateButtons();
 
-    // Animate phase bars on slide 7
+    // Animate phase bars on slide 7 based on the technology counts
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const fills = entry.target.querySelectorAll('.phase-fill');
+          const totalCount = Array.from(fills).reduce((sum, fill) => {
+            return sum + Number(fill.dataset.count || 0);
+          }, 0);
+
           fills.forEach((fill, index) => {
+            const count = Number(fill.dataset.count || 0);
+            const widthPercent = totalCount > 0 ? (count / totalCount) * 100 : 0;
             setTimeout(() => {
-              fill.style.width = '20%';
+              fill.style.width = `${widthPercent}%`;
             }, index * 100);
           });
         }
