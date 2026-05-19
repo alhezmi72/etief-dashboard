@@ -3,761 +3,1541 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Emerging Technology Exploration Framework - Presentation</title>
+  <title>Emerging Technology Exploration Framework</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --ink: #0a0e1a;
+      --ink-soft: #1c2235;
+      --ink-muted: #2e3650;
+      --slate: #64748b;
+      --mist: #94a3b8;
+      --pale: #e2e8f0;
+      --white: #ffffff;
+      --accent: #00d4aa;
+      --accent-warm: #f59e0b;
+      --accent-blue: #3b82f6;
+      --accent-rose: #f43f5e;
+      --sidebar-w: 72px;
+      --gutter: 48px;
     }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    /* ── LAYOUT ── */
+    .shell {
+      display: flex;
+      width: 100vw; height: 100vh;
       overflow: hidden;
     }
 
-    .presentation {
-      width: 100vw;
-      height: 100vh;
-      position: relative;
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      height: 100%;
+      background: var(--ink-soft);
+      border-right: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 0;
+      flex-shrink: 0;
+      z-index: 20;
     }
 
-    .slide {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-      opacity: 0;
-      transform: translateX(100%);
-      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    .sidebar-logo {
+      width: 36px; height: 36px;
+      background: var(--accent);
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 60px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.5px;
+    }
+
+    .sidebar-dots {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .s-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--ink-muted);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .s-dot.active {
+      background: var(--accent);
+      width: 6px; height: 18px;
+      border-radius: 3px;
+    }
+
+    .s-dot:hover:not(.active) { background: var(--mist); }
+
+    .sidebar-slide-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--slate);
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+      letter-spacing: 1px;
+    }
+
+    /* ── MAIN STAGE ── */
+    .stage {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── SLIDES ── */
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.55s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.55s cubic-bezier(0.4,0,0.2,1);
+      transform: translateY(20px);
     }
 
     .slide.active {
       opacity: 1;
-      transform: translateX(0);
+      pointer-events: all;
+      transform: translateY(0);
     }
 
-    .slide.prev {
-      transform: translateX(-100%);
-    }
+    .slide.prev { transform: translateY(-20px); }
 
-    .slide-content {
-      background: white;
-      border-radius: 20px;
-      padding: 60px;
-      max-width: 1200px;
+    /* ── SLIDE INNER LAYOUT ── */
+    .sl-inner {
       width: 100%;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    h1 {
-      color: #4839cc;
-      font-size: 3.5em;
-      margin-bottom: 20px;
-      font-weight: 900;
-    }
-
-    h2 {
-      color: #4839cc;
-      font-size: 2.5em;
-      margin-bottom: 30px;
-      font-weight: 700;
-    }
-
-    h3 {
-      color: #0891b2;
-      font-size: 1.8em;
-      margin-top: 30px;
-      margin-bottom: 15px;
-      font-weight: 600;
-    }
-
-    p, li {
-      color: #374151;
-      font-size: 1.2em;
-      line-height: 1.8;
-      margin-bottom: 15px;
-    }
-
-    ul {
-      margin-left: 30px;
-    }
-
-    .subtitle {
-      color: #6b7280;
-      font-size: 1.5em;
-      margin-bottom: 40px;
-    }
-
-    .controls {
-      position: fixed;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 20px;
-      z-index: 1000;
-    }
-
-    button {
-      background: white;
-      border: none;
-      padding: 15px 30px;
-      border-radius: 50px;
-      font-size: 1.1em;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s;
-      color: #4839cc;
-    }
-
-    button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .slide-counter {
-      position: fixed;
-      top: 40px;
-      right: 40px;
-      background: white;
-      padding: 15px 25px;
-      border-radius: 50px;
-      font-weight: 600;
-      color: #4839cc;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      z-index: 1000;
-    }
-
-    .stage-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      margin-top: 30px;
-    }
-
-    .stage-card {
-      background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
-      padding: 25px;
-      border-radius: 15px;
-      color: white;
-    }
-
-    .stage-card h4 {
-      color: white;
-      font-size: 1.4em;
-      margin-bottom: 10px;
-    }
-
-    .stage-card p {
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 1em;
-    }
-
-    .result-box {
-      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-      border-left: 5px solid #0891b2;
-      padding: 25px;
-      border-radius: 10px;
-      margin: 20px 0;
-    }
-
-    .result-box strong {
-      color: #0891b2;
-      font-size: 1.3em;
-    }
-
-    .metric-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      margin-top: 30px;
-    }
-
-    .metric-card {
-      background: linear-gradient(135deg, #4839cc 0%, #667eea 100%);
-      padding: 30px;
-      border-radius: 15px;
-      text-align: center;
-      color: white;
-    }
-
-    .metric-card .number {
-      font-size: 3em;
-      font-weight: 900;
-      margin-bottom: 10px;
-    }
-
-    .metric-card .label {
-      font-size: 1.1em;
-      opacity: 0.9;
-    }
-
-    .title-slide {
-      text-align: center;
-    }
-
-    .title-slide h1 {
-      font-size: 4em;
-      margin-bottom: 30px;
-    }
-
-    .title-slide .org {
-      color: #667eea;
-      font-size: 1.8em;
-      margin-top: 40px;
-      font-weight: 600;
-    }
-
-    .phase-distribution {
+      height: 100%;
       display: flex;
       flex-direction: column;
-      gap: 15px;
-      margin-top: 20px;
+      padding: var(--gutter);
+      overflow: hidden;
     }
 
-    .phase-bar {
+    /* ── SLIDE HEADER ── */
+    .sl-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .sl-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(28px, 3.5vw, 52px);
+      line-height: 1.1;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .sl-sub {
+      font-size: 18px;
+      color: var(--mist);
+      font-weight: 300;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .sl-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* ── RULE ── */
+    .sl-rule {
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent) 0%, rgba(0,212,170,0) 60%);
+      margin-bottom: 28px;
+      flex-shrink: 0;
+    }
+
+    /* ── CARDS ── */
+    .card-row {
+      display: flex;
+      gap: 14px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .card {
+      background: var(--ink-soft);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 22px;
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .card-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .card-body {
+      font-size: 18px;
+      color: var(--mist);
+      line-height: 1.6;
+    }
+
+    /* ACCENT CARD */
+    .card.accent-card {
+      background: linear-gradient(135deg, rgba(0,212,170,0.12), rgba(0,212,170,0.04));
+      border-color: rgba(0,212,170,0.25);
+    }
+
+    .card.accent-card .card-title { color: var(--accent); }
+
+    /* ── METRIC STRIP ── */
+    .metric-strip {
+      display: flex;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .metric {
+      flex: 1;
+      background: var(--ink-soft);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-val {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .metric-val .accent { color: var(--accent); }
+
+    .metric-lbl {
+      font-size: 20px;
+      color: var(--slate);
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    .metric-bg {
+      position: absolute;
+      bottom: -8px; right: -8px;
+      font-size: 64px;
+      opacity: 0.04;
+      font-family: 'DM Serif Display', serif;
+      line-height: 1;
+    }
+
+    /* ── LIST ── */
+    .sl-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sl-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 18px;
+      color: var(--mist);
+      line-height: 1.5;
+    }
+
+    .sl-list li::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+
+    .sl-list li strong { color: var(--white); font-weight: 600; }
+
+    /* ── TWO-COL ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+    }
+
+    /* ── HIGHLIGHT BOX ── */
+    .hl-box {
+      background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(59,130,246,0.04));
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 14px;
+      padding: 18px 22px;
+      flex-shrink: 0;
+    }
+
+    .hl-box .label { color: var(--accent-blue); font-size: 15px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+    .hl-box p { font-size: 18px; color: var(--mist); line-height: 1.6; }
+    .hl-box strong { color: var(--white); }
+
+    .warn-box {
+      background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.04));
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 14px;
+      padding: 18px 22px;
+      flex-shrink: 0;
+    }
+
+    .warn-box .label { color: var(--accent-warm); font-size: 15px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+    .warn-box p { font-size: 18px; color: var(--mist); line-height: 1.6; }
+    .warn-box strong { color: var(--white); }
+
+    .green-box {
+      background: linear-gradient(135deg, rgba(0,212,170,0.1), rgba(0,212,170,0.03));
+      border: 1px solid rgba(0,212,170,0.2);
+      border-radius: 14px;
+      padding: 16px 20px;
+      flex-shrink: 0;
+    }
+
+    .green-box .label { color: var(--accent); font-size: 15px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+    .green-box p { font-size: 18px; color: var(--mist); line-height: 1.6; }
+    .green-box strong { color: var(--white); }
+
+    /* ── TAG ── */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(0,212,170,0.12);
+      border: 1px solid rgba(0,212,170,0.2);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.3px;
+    }
+
+    /* ── TITLE SLIDE ── */
+    .slide-title-bg {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse 70% 70% at 80% 50%, rgba(0,212,170,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 20% 80%, rgba(59,130,246,0.05) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .slide-title-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .title-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      padding: var(--gutter) calc(var(--gutter) * 1.5);
+      max-width: 900px;
+    }
+
+    .title-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 15px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .title-h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(36px, 5.5vw, 72px);
+      line-height: 1.05;
+      color: var(--white);
+      margin-bottom: 24px;
+    }
+
+    .title-h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .title-sub {
+      font-size: 18px;
+      color: var(--mist);
+      font-weight: 300;
+      line-height: 1.6;
+      max-width: 560px;
+      margin-bottom: 44px;
+    }
+
+    .title-org {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--slate);
+      letter-spacing: 0.5px;
+    }
+
+    .title-org-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    /* ── PHASE BARS ── */
+    .phase-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .phase-row {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 14px;
     }
 
-    .phase-label {
-      width: 200px;
-      font-weight: 600;
-      color: #374151;
-      font-size: 1em;
+    .phase-lbl {
+      font-size: 17px;
+      color: var(--mist);
+      width: 190px;
+      flex-shrink: 0;
+      line-height: 1.3;
     }
 
     .phase-track {
       flex: 1;
-      height: 40px;
-      background: #e5e7eb;
-      border-radius: 20px;
+      height: 28px;
+      background: var(--ink-muted);
+      border-radius: 6px;
       overflow: hidden;
-      position: relative;
     }
 
     .phase-fill {
       height: 100%;
-      background: linear-gradient(90deg, #0891b2 0%, #0e7490 100%);
+      background: linear-gradient(90deg, var(--accent), rgba(0,212,170,0.5));
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      padding-right: 15px;
-      color: white;
+      padding-right: 10px;
+      font-size: 15px;
       font-weight: 700;
-      transition: width 1s ease-out;
+      color: var(--ink);
+      transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
     }
 
-    .highlight {
-      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-      padding: 5px 10px;
-      border-radius: 5px;
-      color: #92400e;
+    /* ── TECH GRID ── */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .tech-item {
+      background: var(--ink-soft);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .tech-rank {
+      font-family: 'DM Mono', monospace;
+      font-size: 15px;
+      color: var(--accent);
+      font-weight: 500;
+      flex-shrink: 0;
+      padding-top: 1px;
+    }
+
+    .tech-name {
+      font-size: 18px;
       font-weight: 600;
+      color: var(--white);
+      margin-bottom: 4px;
+      line-height: 1.3;
     }
 
-    .key-finding {
-      background: white;
-      border: 3px solid #0891b2;
-      padding: 20px;
-      border-radius: 10px;
-      margin: 15px 0;
+    .tech-meta {
+      font-size: 18px;
+      color: var(--slate);
+      line-height: 1.4;
     }
 
-    .key-finding h4 {
-      color: #0891b2;
+    /* ── SVG curves ── */
+    .curve-wrap {
+      background: var(--ink-soft);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 16px;
+      flex: 1.2;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .curve-label {
+      font-size: 15px;
+      color: var(--slate);
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
       margin-bottom: 10px;
-      font-size: 1.3em;
     }
+
+    .curve-wrap svg { flex: 1; width: 100%; height: 100%; }
+
+    /* ── CONTROLS ── */
+    .controls {
+      position: fixed;
+      bottom: 28px;
+      right: 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 100;
+    }
+
+    .ctrl-btn {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(28,34,53,0.9);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      color: var(--white);
+      font-size: 18px;
+    }
+
+    .ctrl-btn:hover:not(:disabled) {
+      background: rgba(0,212,170,0.15);
+      border-color: rgba(0,212,170,0.4);
+      color: var(--accent);
+    }
+
+    .ctrl-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .ctrl-counter {
+      font-family: 'DM Mono', monospace;
+      font-size: 18px;
+      color: var(--slate);
+      min-width: 44px;
+      text-align: center;
+    }
+
+    /* ── KNOWLEDGE CURVE interactive ── */
+    .kc-wrap {
+      background: var(--ink-soft);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 18px;
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .milestone-point {
+      fill: var(--ink);
+      stroke: var(--accent);
+      stroke-width: 3;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .milestone-point:hover { r: 10; stroke: var(--accent-warm); }
+
+    .milestone-info {
+      position: absolute;
+      width: 230px;
+      background: var(--ink-soft);
+      border: 1px solid rgba(0,212,170,0.25);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 15px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: all 0.3s;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+    }
+
+    .milestone-info.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0);
+    }
+
+    .milestone-info h4 { color: var(--accent); font-size: 14px; margin-bottom: 6px; }
+    .milestone-info p { color: var(--mist); line-height: 1.5; margin-bottom: 4px; }
+
+    /* ── GARTNER on dark ── */
+    .g-axis-line { stroke: rgba(255,255,255,0.1); stroke-width: 1.5; }
+    .gartner-curve-path { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 8px rgba(0,212,170,0.4)); }
+    .curve-ring { fill: none; stroke: var(--accent); stroke-width: 3; opacity: 0.8; }
+    .curve-ring-bg { fill: var(--ink-muted); }
+    .curve-count { fill: var(--white); font-size: 15px; font-weight: 700; font-family: 'DM Mono', monospace; }
+    .curve-phase-badge { fill: var(--slate); font-size: 13px; font-weight: 600; font-family: 'DM Sans', sans-serif; }
+
+    /* Axis labels */
+    .axis-lbl { fill: rgba(255,255,255,0.08); stroke: none; font-size: 12px; }
+    .year-label { fill: var(--slate); font-size: 18px; font-weight: 600; font-family: 'DM Mono', monospace; }
+
+    .knowledge-curve-path {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 4;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 6px rgba(0,212,170,0.4));
+    }
+
+    .axis-line { stroke: rgba(255,255,255,0.1); stroke-width: 1.5; }
+    .guide-line { stroke: rgba(255,255,255,0.06); stroke-width: 1.5; stroke-dasharray: 5 5; }
+
+    /* ── ROADMAP ── */
+    .roadmap {
+      display: flex;
+      gap: 0;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .rm-col {
+      flex: 1;
+      position: relative;
+      padding: 20px 20px 20px 28px;
+      border-left: 2px solid var(--ink-muted);
+    }
+
+    .rm-col:first-child { border-left: none; padding-left: 0; }
+
+    .rm-dot {
+      position: absolute;
+      left: -7px; top: 22px;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .rm-col:first-child .rm-dot { display: none; }
+
+    .rm-period {
+      font-family: 'DM Mono', monospace;
+      font-size: 15px;
+      color: var(--accent);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .rm-head {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 14px;
+    }
+
+    .rm-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .rm-items li {
+      font-size: 17px;
+      color: var(--mist);
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      line-height: 1.5;
+    }
+
+    .rm-items li::before {
+      content: '→';
+      color: var(--accent);
+      flex-shrink: 0;
+      font-size: 17px;
+      margin-top: 1px;
+    }
+
+    /* ── THANK YOU ── */
+    .ty-ring {
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,212,170,0.08);
+      top: 50%; left: 60%;
+      transform: translate(-50%, -50%);
+    }
+
+    .ty-ring:nth-child(2) { width: 700px; height: 700px; border-color: rgba(0,212,170,0.05); }
+    .ty-ring:nth-child(3) { width: 900px; height: 900px; border-color: rgba(0,212,170,0.03); }
+
+    /* scrollable inner containers if needed */
+    .scroll-inner {
+      overflow-y: auto;
+      flex: 1;
+      min-height: 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--ink-muted) transparent;
+    }
+
+    .scroll-inner::-webkit-scrollbar { width: 4px; }
+    .scroll-inner::-webkit-scrollbar-track { background: transparent; }
+    .scroll-inner::-webkit-scrollbar-thumb { background: var(--ink-muted); border-radius: 2px; }
+
+    /* formula */
+    .formula {
+      font-family: 'DM Mono', monospace;
+      font-size: 16px;
+      color: var(--accent);
+      background: rgba(0,212,170,0.06);
+      border: 1px solid rgba(0,212,170,0.15);
+      border-radius: 10px;
+      padding: 14px 18px;
+      line-height: 1.7;
+      flex-shrink: 0;
+    }
+
+    .dim-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--ink-soft);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .dim-icon { font-size: 18px; flex-shrink: 0; }
+    .dim-name { font-size: 18px; font-weight: 600; color: var(--white); }
+    .dim-desc { font-size: 15px; color: var(--slate); margin-top: 2px; }
+
+    /* portfolio category list */
+    .cat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .cat-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: var(--ink-soft);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      font-size: 18px;
+      color: var(--mist);
+    }
+
+    .cat-item span { font-size: 18px; flex-shrink: 0; }
+
+    /* alignment items */
+    .align-section { margin-bottom: 12px; flex-shrink: 0; }
+    .align-head {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+
+    .align-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .align-list li {
+      list-style: none;
+      font-size: 17px;
+      color: var(--mist);
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      line-height: 1.5;
+    }
+
+    .align-list li::before {
+      content: '◆';
+      font-size: 8px;
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+
+    /* insight boxes */
+    .insight-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .insight-box {
+      background: var(--ink-soft);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      padding: 16px 18px;
+      flex: 1;
+    }
+
+    .insight-box .ib-head {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .insight-box ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .insight-box ul li {
+      font-size: 17px;
+      color: var(--mist);
+      display: flex;
+      gap: 8px;
+      line-height: 1.45;
+    }
+
+    .insight-box ul li::before {
+      content: '—';
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
   </style>
 </head>
 <body>
-  <div class="presentation">
-    <!-- Slide 1: Title -->
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">ET</div>
+    <div class="sidebar-dots" id="dotContainer"></div>
+    <div class="sidebar-slide-num" id="slideNumLabel">01 / 15</div>
+  </aside>
+
+  <!-- STAGE -->
+  <main class="stage" id="stage">
+
+    <!-- ── SLIDE 1: TITLE ── -->
     <div class="slide active">
-      <div class="slide-content title-slide">
-        <h1>Emerging Technology Exploration Framework</h1>
-        <p class="subtitle">A Systematic Approach to Technology Intelligence</p>
-        <div style="margin-top: 60px;">
-          <p style="font-size: 1.3em; color: #6b7280;">Multi-source AI-driven consensus analysis for strategic technology foresight</p>
-        </div>
-        <p class="org">Qatar Mobility Innovations Center (QMIC)</p>
-      </div>
-    </div>
-
-    <!-- Slide 2: Challenge & Opportunity -->
-    <div class="slide">
-      <div class="slide-content">
-        <h2>The Challenge</h2>
-        <div class="result-box">
-          <p><strong>Organizations face critical decisions:</strong></p>
-          <ul>
-            <li>Which emerging technologies to invest in?</li>
-            <li>When to adopt new innovations?</li>
-            <li>How to balance risk and opportunity?</li>
-            <li>Which technologies align with strategic goals?</li>
-          </ul>
-        </div>
-        <h3>Traditional Approaches Fall Short</h3>
-        <ul>
-          <li>📊 Reliance on single-source analysis</li>
-          <li>⏰ Time-consuming manual research</li>
-          <li>🎯 Lack of systematic evaluation criteria</li>
-          <li>❌ Missing strategic alignment assessment</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Slide 3: Framework Overview -->
-    <div class="slide">
-      <div class="slide-content">
-        <h2>Framework Approach</h2>
-        <p class="subtitle">4-Stage Systematic Methodology</p>
-        <div class="stage-grid">
-          <div class="stage-card">
-            <h4>🔍 Stage 1: Scanning</h4>
-            <p>Multi-source technology identification via Claude, ChatGPT, Gemini, and DeepSeek</p>
-          </div>
-          <div class="stage-card">
-            <h4>📊 Stage 2: Assessment</h4>
-            <p>Weighted scoring across 5 dimensions: TRL, Impact, Strategic Fit, Barriers, Sustainability</p>
-          </div>
-          <div class="stage-card">
-            <h4>🎯 Stage 3: Prioritization</h4>
-            <p>Portfolio matrix classification and roadmapping across time horizons</p>
-          </div>
-          <div class="stage-card">
-            <h4>⚡ Stage 4: Action</h4>
-            <p>Implementation planning with KPIs and continuous monitoring</p>
-          </div>
+      <div class="slide-title-bg"></div>
+      <div class="slide-title-grid"></div>
+      <div class="title-content">
+        <div class="title-eyebrow">QMIC · Technology Foresight · 2026</div>
+        <h1 class="title-h1">Emerging Technology<br><em>Exploration Framework</em></h1>
+        <p class="title-sub">A systematic, multi-source AI-driven approach to technology intelligence and strategic decision-making.</p>
+        <div class="title-org">
+          <div class="title-org-dot"></div>
+          Qatar Mobility Innovations Center (QMIC)
         </div>
       </div>
     </div>
 
-    <!-- Slide 4: Innovation - Data Consolidation -->
+    <!-- ── SLIDE 2: KNOWLEDGE DOUBLING ── -->
     <div class="slide">
-      <div class="slide-content">
-        <h2>Key Innovation: Multi-Source Consolidation</h2>
-        <h3>Leveraging AI Diversity for Consensus</h3>
-        <div class="result-box">
-          <p><strong>Method:</strong> Aggregate insights from 4 leading AI models</p>
-          <ul>
-            <li>Claude (Anthropic) - analytical depth</li>
-            <li>ChatGPT (OpenAI) - broad knowledge</li>
-            <li>Gemini (Google) - multimodal integration</li>
-            <li>DeepSeek - specialized technical analysis</li>
-          </ul>
+      <div class="sl-inner">
+        <div class="sl-eyebrow">Context</div>
+        <h2 class="sl-title">Knowledge Doubling Curve</h2>
+        <p class="sl-sub">The acceleration of human knowledge creation across generations</p>
+        <div class="sl-rule"></div>
+        <div class="kc-wrap" style="position:relative; overflow:hidden;">
+          <svg style="width:100%;height:100%;" viewBox="0 0 1100 380" preserveAspectRatio="xMidYMid meet">
+            <line x1="80" y1="320" x2="1050" y2="320" class="axis-line"/>
+            <line x1="80" y1="50" x2="80" y2="320" class="axis-line"/>
+            <text x="80" y="42" fill="rgba(255,255,255,0.2)" font-size="11" font-family="DM Sans" text-anchor="middle">Knowledge</text>
+
+            <line x1="140" y1="265" x2="140" y2="320" class="guide-line"/>
+            <line x1="400" y1="235" x2="400" y2="320" class="guide-line"/>
+            <line x1="660" y1="165" x2="660" y2="320" class="guide-line"/>
+            <line x1="960" y1="55" x2="960" y2="320" class="guide-line"/>
+
+            <path d="M140 265 C 290 255, 430 215, 560 175 S 810 100, 960 55" class="knowledge-curve-path"/>
+
+            <circle cx="140" cy="265" r="8" class="milestone-point" data-target="kinfo-1900"/>
+            <circle cx="400" cy="223" r="8" class="milestone-point" data-target="kinfo-1945"/>
+            <circle cx="660" cy="147" r="8" class="milestone-point" data-target="kinfo-1982"/>
+            <circle cx="960" cy="55" r="8" class="milestone-point" data-target="kinfo-2025"/>
+
+            <text x="130" y="345" class="year-label">1900</text>
+            <text x="375" y="345" class="year-label">1945</text>
+            <text x="636" y="345" class="year-label">1982</text>
+            <text x="936" y="345" class="year-label">2025</text>
+          </svg>
+
+          <div id="kinfo-1900" class="milestone-info" style="top:170px;left:60px;">
+            <h4>📅 1900 — 100 Year Cycle</h4>
+            <p>Industrial Era: slow, incremental scientific advancement. Knowledge doubled every century.</p>
+          </div>
+          <div id="kinfo-1945" class="milestone-info" style="top:90px;left:290px;">
+            <h4>⚔️ 1945 — 25 Year Cycle</h4>
+            <p>Post-war acceleration driven by industrial research and major scientific breakthroughs.</p>
+          </div>
+          <div id="kinfo-1982" class="milestone-info" style="top:50px;left:490px;">
+            <h4>💻 1982 — 13 Month Cycle</h4>
+            <p>Digital computing and networking transformed information growth exponentially.</p>
+          </div>
+          <div id="kinfo-2025" class="milestone-info" style="top:10px;left:670px;">
+            <h4>⚡ 2025 — 12 Hour Cycle</h4>
+            <p>AI, IoT, and real-time data ecosystems drive near-instantaneous knowledge acceleration.</p>
+          </div>
         </div>
-        <h3>Consolidation Algorithm</h3>
-        <ul>
-          <li>✅ Technology name normalization & deduplication</li>
-          <li>✅ Cross-source TIS (Tech Impact Score) calculation</li>
-          <li>✅ Confidence scoring based on consensus</li>
-          <li>✅ Phase-balanced selection across Gartner Hype Cycle</li>
-        </ul>
+        <div class="warn-box" style="margin-top:12px; flex-shrink:0;">
+          <div class="label">Critical Implication</div>
+          <p>Strategic technology foresight is now <strong>essential</strong> — innovation cycles compress faster every decade.</p>
+        </div>
       </div>
     </div>
 
-    <!-- Slide 5: Assessment Framework -->
+    <!-- ── SLIDE 3: CHALLENGE ── -->
     <div class="slide">
-      <div class="slide-content">
-        <h2>Assessment Methodology</h2>
-        <h3>Tech Impact Score (TIS) Formula</h3>
-        <div class="result-box">
-          <p><strong>TIS = 0.35×Impact + 0.30×Strategic Fit + 0.20×(10-Barriers) + 0.15×(10-Sustainability)</strong></p>
-        </div>
-        <h3>Five Evaluation Dimensions</h3>
-        <ul>
-          <li><strong>Technology Maturity (TRL):</strong> Readiness level 1-9</li>
-          <li><strong>Business Impact:</strong> Revenue growth, cost reduction potential</li>
-          <li><strong>Strategic Fit:</strong> Alignment with QMIC vision & mission</li>
-          <li><strong>Adoption Barriers:</strong> Regulatory, skills, infrastructure challenges</li>
-          <li><strong>Sustainability:</strong> ESG impact, circular economy potential</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Slide 6: Main Results - Portfolio -->
-    <div class="slide">
-      <div class="slide-content">
-        <h2>Main Results: Consolidated Portfolio</h2>
-        <div class="metric-grid">
-          <div class="metric-card">
-            <div class="number">30</div>
-            <div class="label">Technologies Identified</div>
+      <div class="sl-inner">
+        <div class="sl-eyebrow">Problem Space</div>
+        <h2 class="sl-title">The Challenge</h2>
+        <p class="sl-sub">Organizations face compounding decisions in a rapidly shifting technology landscape</p>
+        <div class="sl-rule"></div>
+        <div class="sl-body">
+          <div class="hl-box">
+            <div class="label">Core Decisions</div>
+            <p>Which emerging technologies to invest in? When to adopt? How to balance risk and opportunity? Which align with strategy?</p>
           </div>
-          <div class="metric-card">
-            <div class="number">8</div>
-            <div class="label">Technology Categories</div>
-          </div>
-          <div class="metric-card">
-            <div class="number">0.87</div>
-            <div class="label">Avg. Confidence Score</div>
-          </div>
-        </div>
-        <h3 style="margin-top: 40px;">Technology Categories</h3>
-        <ul>
-          <li>AI & Automation</li>
-          <li>Connectivity & IoT</li>
-          <li>Security, Trust & Privacy</li>
-          <li>Energy, Climate & Materials</li>
-          <li>Computing & Infrastructure</li>
-          <li>Quantum Technologies</li>
-          <li>Robotics & Physical Systems</li>
-          <li>Health, Bio & Experience Tech</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Slide 7: Hype Cycle Distribution -->
-    <div class="slide">
-      <div class="slide-content">
-        <h2>Gartner Hype Cycle Distribution</h2>
-        <p class="subtitle">Balanced across all maturity phases</p>
-        <div class="phase-distribution">
-          <div class="phase-bar">
-            <div class="phase-label">Innovation Trigger</div>
-            <div class="phase-track">
-              <div class="phase-fill" data-count="8">8</div>
+          <div class="card-row" style="flex:1; min-height:0;">
+            <div class="card">
+              <span class="card-icon">📊</span>
+              <div class="card-title">Single-Source Bias</div>
+              <div class="card-body">Reliance on one analyst model introduces blind spots and amplifies individual biases.</div>
             </div>
-          </div>
-          <div class="phase-bar">
-            <div class="phase-label">Peak of Inflated Expectations</div>
-            <div class="phase-track">
-              <div class="phase-fill" data-count="5">5</div>
+            <div class="card">
+              <span class="card-icon">⏰</span>
+              <div class="card-title">Time Constraints</div>
+              <div class="card-body">Traditional manual research methods cannot keep pace with accelerating innovation cycles.</div>
             </div>
-          </div>
-          <div class="phase-bar">
-            <div class="phase-label">Trough of Disillusionment</div>
-            <div class="phase-track">
-              <div class="phase-fill" data-count="5">5</div>
+            <div class="card">
+              <span class="card-icon">🎯</span>
+              <div class="card-title">No Criteria</div>
+              <div class="card-body">Lack of systematic evaluation standards leads to inconsistent technology assessments.</div>
             </div>
-          </div>
-          <div class="phase-bar">
-            <div class="phase-label">Slope of Enlightenment</div>
-            <div class="phase-track">
-              <div class="phase-fill" data-count="7">7</div>
-            </div>
-          </div>
-          <div class="phase-bar">
-            <div class="phase-label">Plateau of Productivity</div>
-            <div class="phase-track">
-              <div class="phase-fill" data-count="5">5</div>
+            <div class="card">
+              <span class="card-icon">❌</span>
+              <div class="card-title">Strategy Gap</div>
+              <div class="card-body">Missing alignment assessment means investments may not serve organizational goals.</div>
             </div>
           </div>
         </div>
-        <div class="result-box" style="margin-top: 30px;">
-          <p><strong>Achievement:</strong> Even distribution ensures comprehensive view across entire technology lifecycle</p>
-        </div>
       </div>
     </div>
 
-    <!-- Slide 8: Top Technologies -->
+    <!-- ── SLIDE 4: FRAMEWORK APPROACH ── -->
     <div class="slide">
-      <div class="slide-content">
-        <h2>Top 10 High-Impact Technologies</h2>
-        <p class="subtitle">Ranked by Tech Impact Score (TIS)</p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
-          <div class="key-finding">
-            <h4>1. Agentic AI</h4>
-            <p>TIS: 8.5 | High strategic fit for automation</p>
-          </div>
-          <div class="key-finding">
-            <h4>2. Edge AI & Federated Learning</h4>
-            <p>TIS: 8.2 | Critical for IoT applications</p>
-          </div>
-          <div class="key-finding">
-            <h4>3. V2X Communication</h4>
-            <p>TIS: 8.8 | Perfect alignment with QMIC mobility focus</p>
-          </div>
-          <div class="key-finding">
-            <h4>4. Zero Trust Architecture</h4>
-            <p>TIS: 8.1 | Mature security framework</p>
-          </div>
-          <div class="key-finding">
-            <h4>5. Green Hydrogen Production</h4>
-            <p>TIS: 8.3 | High sustainability impact</p>
-          </div>
-          <div class="key-finding">
-            <h4>6. Next-Gen Battery Storage</h4>
-            <p>TIS: 8.4 | Enabling renewable transition</p>
+      <div class="sl-inner">
+        <div class="sl-eyebrow">Solution</div>
+        <h2 class="sl-title">Framework Approach</h2>
+        <p class="sl-sub">4-Stage systematic methodology for technology intelligence</p>
+        <div class="sl-rule"></div>
+        <div class="sl-body">
+          <div class="card-row">
+            <div class="card accent-card">
+              <span class="card-icon">🔍</span>
+              <div class="card-title">Stage 1 — Scanning</div>
+              <div class="card-body">Multi-source technology identification via Claude, ChatGPT, Gemini, and DeepSeek working in parallel consensus.</div>
+            </div>
+            <div class="card">
+              <span class="card-icon">📊</span>
+              <div class="card-title">Stage 2 — Assessment</div>
+              <div class="card-body">Weighted scoring across 5 dimensions: TRL, Impact, Strategic Fit, Barriers, and Sustainability.</div>
+            </div>
+            <div class="card">
+              <span class="card-icon">🎯</span>
+              <div class="card-title">Stage 3 — Prioritization</div>
+              <div class="card-body">Portfolio matrix classification and roadmapping across short, mid, and long-term time horizons.</div>
+            </div>
+            <div class="card">
+              <span class="card-icon">⚡</span>
+              <div class="card-title">Stage 4 — Action</div>
+              <div class="card-body">Implementation planning with KPIs, governance structures, and continuous monitoring loops.</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Slide 9: Strategic Insights -->
+    <!-- ── SLIDE 5: DATA CONSOLIDATION ── -->
     <div class="slide">
-      <div class="slide-content">
-        <h2>Strategic Insights</h2>
-        <h3>Quick Wins (High Impact, Near-term)</h3>
-        <div class="result-box">
-          <ul>
-            <li>Zero Trust Architecture (TRL 9)</li>
-            <li>Predictive Analytics & ML Pipelines (TRL 9)</li>
-            <li>Fleet Telematics AI (TRL 9) - <span class="highlight">QMIC aligned</span></li>
-          </ul>
-        </div>
-        
-        <h3>Strategic Bets (High Impact, Long-term)</h3>
-        <div class="result-box">
-          <ul>
-            <li>Agentic AI (TRL 6)</li>
-            <li>Quantum-Safe Cryptography (TRL 5)</li>
-            <li>Autonomous Vehicles L4/L5 (TRL 6) - <span class="highlight">QMIC aligned</span></li>
-          </ul>
-        </div>
-
-        <h3>Key Recommendation</h3>
-        <div class="key-finding">
-          <h4>Balanced Portfolio Approach</h4>
-          <p>30% Quick Wins | 40% Strategic Bets | 20% Incremental | 10% Exploratory</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Slide 10: QMIC Alignment -->
-    <div class="slide">
-      <div class="slide-content">
-        <h2>QMIC Strategic Alignment</h2>
-        <h3>Technologies with Strategic Fit ≥ 9/10</h3>
-        <div class="key-finding">
-          <h4>🚗 Mobility & Transportation</h4>
-          <ul>
-            <li>V2X Communication - Connected vehicle infrastructure</li>
-            <li>Autonomous Vehicles L4/L5 - Next-gen mobility</li>
-            <li>AI-Powered Traffic Management - Smart city optimization</li>
-            <li>Fleet Telematics AI - Connected fleet solutions</li>
-          </ul>
-        </div>
-        <div class="key-finding">
-          <h4>🌆 Smart City & IoT</h4>
-          <ul>
-            <li>Video Analytics for Smart Cities - Urban monitoring</li>
-            <li>Environmental Monitoring IoT - Air quality tracking</li>
-            <li>Industrial IoT Platforms - Predictive maintenance</li>
-          </ul>
-        </div>
-        <div class="result-box">
-          <p><strong>Result:</strong> <span class="highlight">23% of portfolio</span> directly aligned with QMIC's core mission</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Slide 11: Framework Value -->
-    <div class="slide">
-      <div class="slide-content">
-        <h2>Framework Value Proposition</h2>
-        <div class="metric-grid">
-          <div class="metric-card">
-            <div class="number">4×</div>
-            <div class="label">Data Sources Consolidated</div>
+      <div class="sl-inner">
+        <div class="sl-eyebrow">Key Innovation</div>
+        <h2 class="sl-title">Multi-Source Consolidation</h2>
+        <p class="sl-sub">Leveraging AI diversity to build consensus-based intelligence</p>
+        <div class="sl-rule"></div>
+        <div class="sl-body">
+          <div class="card-row" style="flex:0 0 auto;">
+            <div class="card" style="flex-direction:row; display:flex; align-items:center; gap:12px;">
+              <span style="font-size:28px;">🤖</span>
+              <div>
+                <div class="card-title">Claude (Anthropic)</div>
+                <div class="card-body">Analytical depth & reasoning</div>
+              </div>
+            </div>
+            <div class="card" style="flex-direction:row; display:flex; align-items:center; gap:12px;">
+              <span style="font-size:28px;">🟢</span>
+              <div>
+                <div class="card-title">ChatGPT (OpenAI)</div>
+                <div class="card-body">Broad knowledge synthesis</div>
+              </div>
+            </div>
+            <div class="card" style="flex-direction:row; display:flex; align-items:center; gap:12px;">
+              <span style="font-size:28px;">🔷</span>
+              <div>
+                <div class="card-title">Gemini (Google)</div>
+                <div class="card-body">Multimodal integration</div>
+              </div>
+            </div>
+            <div class="card" style="flex-direction:row; display:flex; align-items:center; gap:12px;">
+              <span style="font-size:28px;">🌊</span>
+              <div>
+                <div class="card-title">DeepSeek</div>
+                <div class="card-body">Specialized technical analysis</div>
+              </div>
+            </div>
           </div>
-          <div class="metric-card">
-            <div class="number">5</div>
-            <div class="label">Evaluation Dimensions</div>
-          </div>
-          <div class="metric-card">
-            <div class="number">100%</div>
-            <div class="label">Hype Cycle Coverage</div>
+          <div class="green-box">
+            <div class="label">Consolidation Algorithm</div>
+            <p>Technology name <strong>normalization & deduplication</strong> → cross-source TIS calculation → <strong>confidence scoring</strong> based on consensus → phase-balanced selection across the Gartner Hype Cycle</p>
           </div>
         </div>
-        <h3 style="margin-top: 40px;">Key Benefits</h3>
-        <ul>
-          <li>✅ <strong>Reduced Bias:</strong> Multi-source consensus minimizes single-model limitations</li>
-          <li>✅ <strong>Enhanced Confidence:</strong> Statistical validation across AI sources</li>
-          <li>✅ <strong>Strategic Clarity:</strong> Clear alignment with organizational objectives</li>
-          <li>✅ <strong>Actionable Roadmap:</strong> Phased implementation across 1-5 year horizons</li>
-          <li>✅ <strong>Continuous Intelligence:</strong> Framework enables quarterly updates</li>
-        </ul>
       </div>
     </div>
 
-    <!-- Slide 12: Implementation Roadmap -->
+    <!-- ── SLIDE 6: ASSESSMENT ── -->
     <div class="slide">
-      <div class="slide-content">
-        <h2>Implementation Roadmap</h2>
-        <h3>Short-term (1 Year)</h3>
-        <div class="result-box">
-          <ul>
-            <li>Deploy Quick Win technologies (TRL ≥ 7)</li>
-            <li>Pilot Strategic Bets in controlled environments</li>
-            <li>Establish governance framework & KPIs</li>
-          </ul>
-        </div>
-        
-        <h3>Mid-term (2-3 Years)</h3>
-        <div class="result-box">
-          <ul>
-            <li>Scale successful pilots to production</li>
-            <li>Build internal capability & expertise</li>
-            <li>Form strategic partnerships with innovators</li>
-          </ul>
-        </div>
-
-        <h3>Long-term (5+ Years)</h3>
-        <div class="result-box">
-          <ul>
-            <li>Invest in transformative innovations</li>
-            <li>Lead in selected technology domains</li>
-            <li>Continuous radar updates & portfolio rebalancing</li>
-          </ul>
+      <div class="sl-inner">
+        <div class="sl-eyebrow">Methodology</div>
+        <h2 class="sl-title">Assessment Framework</h2>
+        <p class="sl-sub">Five-dimensional scoring for rigorous technology evaluation</p>
+        <div class="sl-rule"></div>
+        <div class="sl-body">
+          <div class="formula">
+            TIS = 0.35 × Impact &nbsp;+&nbsp; 0.30 × Strategic Fit &nbsp;+&nbsp; 0.20 × (10 − Barriers) &nbsp;+&nbsp; 0.15 × (10 − Sustainability Cost)
+          </div>
+          <div class="sl-list" style="flex:1; min-height:0; gap:10px;">
+            <div class="dim-row">
+              <div class="dim-icon">📐</div>
+              <div>
+                <div class="dim-name">Technology Maturity (TRL)</div>
+                <div class="dim-desc">Readiness level 1–9 — from basic principles to proven deployment</div>
+              </div>
+            </div>
+            <div class="dim-row">
+              <div class="dim-icon">💰</div>
+              <div>
+                <div class="dim-name">Business Impact</div>
+                <div class="dim-desc">Revenue growth potential and cost reduction opportunities</div>
+              </div>
+            </div>
+            <div class="dim-row">
+              <div class="dim-icon">🎯</div>
+              <div>
+                <div class="dim-name">Strategic Fit</div>
+                <div class="dim-desc">Alignment with QMIC vision, mission, and operational priorities</div>
+              </div>
+            </div>
+            <div class="dim-row">
+              <div class="dim-icon">🚧</div>
+              <div>
+                <div class="dim-name">Adoption Barriers</div>
+                <div class="dim-desc">Regulatory, skills, infrastructure, and ecosystem challenges</div>
+              </div>
+            </div>
+            <div class="dim-row">
+              <div class="dim-icon">🌱</div>
+              <div>
+                <div class="dim-name">Sustainability</div>
+                <div class="dim-desc">ESG impact, carbon footprint, and circular economy potential</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Slide 13: Conclusion -->
+    <!-- ── SLIDE 7: MAIN RESULTS ── -->
     <div class="slide">
-      <div class="slide-content">
-        <h2>Conclusion</h2>
-        <div class="key-finding">
-          <h4>Framework Achievements</h4>
-          <ul>
-            <li>Systematic identification of 30 high-impact technologies</li>
-            <li>Multi-source AI consensus with 87% average confidence</li>
-            <li>Balanced portfolio across all maturity phases</li>
-            <li>Strong alignment with QMIC strategic objectives</li>
-          </ul>
-        </div>
-        <h3>Next Steps</h3>
-        <div class="result-box">
-          <ul>
-            <li>🎯 Establish Emerging Technology Board (ETB)</li>
-            <li>🎯 Create Technology Intelligence Unit</li>
-            <li>🎯 Launch pilot projects for Quick Wins</li>
-            <li>🎯 Quarterly framework updates with latest data</li>
-          </ul>
-        </div>
-        <div style="text-align: center; margin-top: 40px;">
-          <p style="font-size: 1.5em; color: #4839cc; font-weight: 700;">
-            From Technology Insight to Strategic Action
-          </p>
+      <div class="sl-inner">
+        <div class="sl-eyebrow">Results</div>
+        <h2 class="sl-title">Consolidated Portfolio</h2>
+        <p class="sl-sub">Technologies identified, ranked, and validated across all AI sources</p>
+        <div class="sl-rule"></div>
+        <div class="sl-body">
+          <div class="metric-strip">
+            <div class="metric">
+              <div class="metric-val"><span class="accent">30</span></div>
+              <div class="metric-lbl">Technologies Identified</div>
+              <div class="metric-bg">30</div>
+            </div>
+            <div class="metric">
+              <div class="metric-val"><span class="accent">8</span></div>
+              <div class="metric-lbl">Technology Categories</div>
+              <div class="metric-bg">8</div>
+            </div>
+            <div class="metric">
+              <div class="metric-val"><span class="accent">0.87</span></div>
+              <div class="metric-lbl">Avg. Confidence Score</div>
+              <div class="metric-bg">87</div>
+            </div>
+          </div>
+          <div class="cat-grid">
+            <div class="cat-item"><span>🤖</span>AI & Automation</div>
+            <div class="cat-item"><span>📡</span>Connectivity & IoT</div>
+            <div class="cat-item"><span>🔒</span>Security, Trust & Privacy</div>
+            <div class="cat-item"><span>🌿</span>Energy, Climate & Materials</div>
+            <div class="cat-item"><span>⚙️</span>Computing & Infrastructure</div>
+            <div class="cat-item"><span>⚛️</span>Quantum Technologies</div>
+            <div class="cat-item"><span>🦾</span>Robotics & Physical Systems</div>
+            <div class="cat-item"><span>🧬</span>Health, Bio & Experience Tech</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Slide 14: Thank You -->
+    <!-- ── SLIDE 8: HYPE CYCLE ── -->
     <div class="slide">
-      <div class="slide-content title-slide">
-        <h1>Thank You</h1>
-        <p class="subtitle">Questions & Discussion</p>
-        <div style="margin-top: 60px;">
-          <p style="font-size: 1.3em; color: #6b7280;">Emerging Technology Exploration Framework</p>
-          <p style="font-size: 1.1em; color: #9ca3af; margin-top: 20px;">Enabling Smart & Safe Living through Innovation</p>
-        </div>
-        <p class="org">Qatar Mobility Innovations Center (QMIC)</p>
-        <div style="margin-top: 40px; font-size: 1em; color: #6b7280;">
-          <p>Framework Tools: www.qmic.com/tech-exploration</p>
+      <div class="sl-inner">
+        <div class="sl-eyebrow">Analysis</div>
+        <h2 class="sl-title">Gartner Hype Cycle Distribution</h2>
+        <p class="sl-sub">Balanced portfolio coverage across all technology maturity phases</p>
+        <div class="sl-rule"></div>
+        <div class="sl-body">
+          <div class="card-row" style="align-items:stretch;">
+            <div class="curve-wrap">
+              <div class="curve-label">Maturity Curve</div>
+              <svg viewBox="0 0 520 280" preserveAspectRatio="xMidYMid meet">
+                <line x1="40" y1="240" x2="500" y2="240" class="g-axis-line"/>
+                <path d="M50 230 C 90 170, 120 105, 160 75 S 240 20, 290 100 S 320 225, 360 195 S 430 130, 490 120"
+                      class="gartner-curve-path"/>
+                <g><circle cx="50" cy="230" r="18" class="curve-ring"/><circle cx="50" cy="230" r="14" class="curve-ring-bg"/><text x="50" y="234" class="curve-count" text-anchor="middle">7</text><text x="50" y="200" class="curve-phase-badge" text-anchor="middle">Trigger</text></g>
+                <g><circle cx="160" cy="75" r="16" class="curve-ring"/><circle cx="160" cy="75" r="12" class="curve-ring-bg"/><text x="160" y="79" class="curve-count" text-anchor="middle">5</text><text x="160" y="52" class="curve-phase-badge" text-anchor="middle">Peak</text></g>
+                <g><circle cx="290" cy="100" r="16" class="curve-ring"/><circle cx="290" cy="100" r="12" class="curve-ring-bg"/><text x="290" y="104" class="curve-count" text-anchor="middle">5</text><text x="290" y="78" class="curve-phase-badge" text-anchor="middle">Trough</text></g>
+                <g><circle cx="360" cy="195" r="20" class="curve-ring"/><circle cx="360" cy="195" r="15" class="curve-ring-bg"/><text x="360" y="199" class="curve-count" text-anchor="middle">8</text><text x="360" y="164" class="curve-phase-badge" text-anchor="middle">Slope</text></g>
+                <g><circle cx="490" cy="120" r="16" class="curve-ring"/><circle cx="490" cy="120" r="12" class="curve-ring-bg"/><text x="490" y="124" class="curve-count" text-anchor="middle">5</text><text x="490" y="98" class="curve-phase-badge" text-anchor="middle">Plateau</text></g>
+              </svg>
+            </div>
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;">
+              <div class="phase-list" id="phaseBars">
+                <div class="phase-row"><div class="phase-lbl">Innovation Trigger</div><div class="phase-track"><div class="phase-fill" data-count="7" style="width:0%">7</div></div></div>
+                <div class="phase-row"><div class="phase-lbl">Peak of Expectations</div><div class="phase-track"><div class="phase-fill" data-count="5" style="width:0%">5</div></div></div>
+                <div class="phase-row"><div class="phase-lbl">Trough of Disillusionment</div><div class="phase-track"><div class="phase-fill" data-count="5" style="width:0%">5</div></div></div>
+                <div class="phase-row"><div class="phase-lbl">Slope of Enlightenment</div><div class="phase-track"><div class="phase-fill" data-count="8" style="width:0%">8</div></div></div>
+                <div class="phase-row"><div class="phase-lbl">Plateau of Productivity</div><div class="phase-track"><div class="phase-fill" data-count="5" style="width:0%">5</div></div></div>
+              </div>
+              <div class="green-box">
+                <div class="label">Achievement</div>
+                <p>30 technologies distributed across <strong>all 5 Gartner phases</strong> — ensuring a comprehensive, lifecycle-aware view.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="slide-counter">
-    <span id="currentSlide">1</span> / <span id="totalSlides">14</span>
-  </div>
+    <!-- ── SLIDE 9: TOP 10 ── -->
+    <div class="slide">
+      <div class="sl-inner">
+        <div class="sl-eyebrow">Rankings</div>
+        <h2 class="sl-title">Top 10 High-Impact Technologies</h2>
+        <p class="sl-sub">Ranked by Tech Impact Score (TIS) and Strategic Fit</p>
+        <div class="sl-rule"></div>
+        <div class="sl-body">
+          <div class="tech-grid">
+            <div class="tech-item"><div class="tech-rank">01</div><div><div class="tech-name">Edge AI Infrastructure</div><div class="tech-meta">TIS 8.95 · Distributed AI for smart cities</div></div></div>
+            <div class="tech-item"><div class="tech-rank">02</div><div><div class="tech-name">AI-Native Cyber Defense</div><div class="tech-meta">TIS 8.85 · Self-learning cybersecurity systems</div></div></div>
+            <div class="tech-item"><div class="tech-rank">03</div><div><div class="tech-name">Digital Twin Ecosystems</div><div class="tech-meta">TIS 8.80 · Real-time city-scale simulation</div></div></div>
+            <div class="tech-item"><div class="tech-rank">04</div><div><div class="tech-name">AI-Orchestrated Smart City</div><div class="tech-meta">TIS 8.40 · Unified AI layer for urban systems</div></div></div>
+            <div class="tech-item"><div class="tech-rank">05</div><div><div class="tech-name">Collaborative Sensing Networks</div><div class="tech-meta">TIS 8.45 · Sensor fusion & distributed monitoring</div></div></div>
+            <div class="tech-item"><div class="tech-rank">06</div><div><div class="tech-name">Trustworthy AI Governance</div><div class="tech-meta">TIS 8.35 · Ethical AI & compliance frameworks</div></div></div>
+            <div class="tech-item"><div class="tech-rank">07</div><div><div class="tech-name">Agentic AI</div><div class="tech-meta">TIS 8.30 · Autonomous multi-agent workflows</div></div></div>
+            <div class="tech-item"><div class="tech-rank">08</div><div><div class="tech-name">Zero Trust Architecture</div><div class="tech-meta">TIS 8.25 · Continuous identity verification</div></div></div>
+            <div class="tech-item"><div class="tech-rank">09</div><div><div class="tech-name">Autonomous Vehicles L4/L5</div><div class="tech-meta">TIS 8.20 · <span class="tag">QMIC aligned</span></div></div></div>
+            <div class="tech-item"><div class="tech-rank">10</div><div><div class="tech-name">Fleet Telematics AI</div><div class="tech-meta">TIS 8.10 · <span class="tag">QMIC aligned</span></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <div class="controls">
-    <button id="prevBtn" onclick="previousSlide()">← Previous</button>
-    <button id="nextBtn" onclick="nextSlide()">Next →</button>
-  </div>
+    <!-- ── SLIDE 10: STRATEGIC INSIGHTS ── -->
+    <div class="slide">
+      <div class="sl-inner">
+        <div class="sl-eyebrow">Strategy</div>
+        <h2 class="sl-title">Strategic Insights</h2>
+        <p class="sl-sub">Portfolio segmentation for actionable technology prioritization</p>
+        <div class="sl-rule"></div>
+        <div class="sl-body">
+          <div class="card-row" style="flex:1; min-height:0;">
+            <div class="insight-col">
+              <div class="insight-box" style="border-color:rgba(0,212,170,0.2);">
+                <div class="ib-head">⚡ Quick Wins — High Impact, Near-term</div>
+                <ul>
+                  <li>Zero Trust Architecture (TRL 9)</li>
+                  <li>Predictive Analytics & ML Pipelines (TRL 9)</li>
+                  <li>Fleet Telematics AI (TRL 9) <span class="tag" style="font-size:10px;">QMIC</span></li>
+                </ul>
+              </div>
+              <div class="insight-box" style="border-color:rgba(59,130,246,0.2);">
+                <div class="ib-head" style="color:var(--accent-blue);">🚀 Strategic Bets — High Impact, Long-term</div>
+                <ul>
+                  <li>Agentic AI (TRL 6)</li>
+                  <li>Quantum-Safe Cryptography (TRL 5)</li>
+                  <li>Autonomous Vehicles L4/L5 (TRL 6) <span class="tag" style="font-size:10px;">QMIC</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="card" style="flex:1.2; display:flex; flex-direction:column; gap:14px;">
+              <div class="card-title" style="font-size:14px;">Key Recommendation</div>
+              <div class="card-body" style="font-size:17px; margin-bottom:0;">Balanced Portfolio Approach</div>
+              <div style="display:flex; flex-direction:column; gap:10px; margin-top:4px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:40px; height:40px; border-radius:50%; background:rgba(0,212,170,0.15); border:2px solid var(--accent); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--accent);">30%</div>
+                  <div style="font-size:17px; color:var(--mist);">Quick Wins</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:40px; height:40px; border-radius:50%; background:rgba(59,130,246,0.15); border:2px solid var(--accent-blue); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--accent-blue);">40%</div>
+                  <div style="font-size:17px; color:var(--mist);">Strategic Bets</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:40px; height:40px; border-radius:50%; background:rgba(245,158,11,0.1); border:2px solid var(--accent-warm); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--accent-warm);">20%</div>
+                  <div style="font-size:17px; color:var(--mist);">Incremental</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:40px; height:40px; border-radius:50%; background:rgba(100,116,139,0.15); border:2px solid var(--slate); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--slate);">10%</div>
+                  <div style="font-size:17px; color:var(--mist);">Exploratory</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <script>
-    let currentSlide = 0;
-    const slides = document.querySelectorAll('.slide');
-    const totalSlides = slides.length;
-    
-    document.getElementById('totalSlides').textContent = totalSlides;
+    <!-- ── SLIDE 11: QMIC ALIGNMENT ── -->
+    <div class="slide">
+      <div class="sl-inner">
+        <div class="sl-eyebrow">QMIC Focus</div>
+        <h2 class="sl-title">Strategic Alignment</h2>
+        <p class="sl-sub">Technologies with Strategic Fit ≥ 9/10 directly mapped to QMIC's core mission</p>
+        <div class="sl-rule"></div>
+        <div class="sl-body">
+          <div class="card-row" style="flex:1; min-height:0;">
+            <div class="card" style="flex:1;">
+              <div class="card-icon">🚗</div>
+              <div class="card-title">Mobility & Transportation</div>
+              <div class="align-list" style="margin-top:10px;">
+                <li>V2X Communication — Connected vehicle infrastructure</li>
+                <li>Autonomous Vehicles L4/L5 — Next-gen mobility</li>
+                <li>AI-Powered Traffic Management — Smart city optimization</li>
+                <li>Fleet Telematics AI — Connected fleet solutions</li>
+              </div>
+            </div>
+            <div class="card" style="flex:1;">
+              <div class="card-icon">🌆</div>
+              <div class="card-title">Smart City & IoT</div>
+              <div class="align-list" style="margin-top:10px;">
+                <li>Video Analytics for Smart Cities — Urban monitoring</li>
+                <li>Environmental Monitoring IoT — Air quality tracking</li>
+                <li>Industrial IoT Platforms — Predictive maintenance</li>
+              </div>
+            </div>
+          </div>
+          <div class="green-box">
+            <div class="label">Portfolio Impact</div>
+            <p><strong>23% of the full portfolio</strong> is directly aligned with QMIC's core mission areas — providing a clear, high-conviction investment thesis.</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    function showSlide(n) {
-      slides[currentSlide].classList.remove('active');
-      slides[currentSlide].classList.add('prev');
-      
-      currentSlide = n;
-      
-      if (currentSlide >= totalSlides) {
-        currentSlide = totalSlides - 1;
-      }
-      if (currentSlide < 0) {
-        currentSlide = 0;
-      }
-      
-      slides.forEach(slide => {
-        slide.classList.remove('active', 'prev');
-      });
-      
-      slides[currentSlide].classList.add('active');
-      document.getElementById('currentSlide').textContent = currentSlide + 1;
-      
-      updateButtons();
-    }
+    <!-- ── SLIDE 12: VALUE PROPOSITION ── -->
+    <div class="slide">
+      <div class="sl-inner">
+        <div class="sl-eyebrow">Value</div>
+        <h2 class="sl-title">Framework Value Proposition</h2>
+        <p class="sl-sub">Measurable advantages over traditional technology assessment approaches</p>
+        <div class="sl-rule"></div>
+        <div class="sl-body">
+          <div class="metric-strip">
+            <div class="metric"><div class="metric-val"><span class="accent">4×</span></div><div class="metric-lbl">Data Sources Consolidated</div></div>
+            <div class="metric"><div class="metric-val"><span class="accent">5</span></div><div class="metric-lbl">Evaluation Dimensions</div></div>
+            <div class="metric"><div class="metric-val"><span class="accent">100%</span></div><div class="metric-lbl">Hype Cycle Coverage</div></div>
+          </div>
+          <div class="sl-list" style="flex:1; min-height:0;">
+            <li><strong>Reduced Bias:</strong> Multi-source consensus minimizes single-model limitations and groupthink</li>
+            <li><strong>Enhanced Confidence:</strong> Statistical validation across AI sources with quantified confidence scores</li>
+            <li><strong>Strategic Clarity:</strong> Clear, traceable alignment with organizational objectives and QMIC vision</li>
+            <li><strong>Actionable Roadmap:</strong> Phased implementation across 1-year, 3-year, and 5-year horizons</li>
+            <li><strong>Continuous Intelligence:</strong> Framework architecture enables structured quarterly updates and re-scoring</li>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    function nextSlide() {
-      if (currentSlide < totalSlides - 1) {
-        showSlide(currentSlide + 1);
-      }
-    }
+    <!-- ── SLIDE 13: ROADMAP ── -->
+    <div class="slide">
+      <div class="sl-inner">
+        <div class="sl-eyebrow">Implementation</div>
+        <h2 class="sl-title">Technology Roadmap</h2>
+        <p class="sl-sub">Phased deployment strategy across short, mid, and long-term horizons</p>
+        <div class="sl-rule"></div>
+        <div class="sl-body">
+          <div class="roadmap">
+            <div class="rm-col">
+              <div class="rm-period">Year 1</div>
+              <div class="rm-head">Short-term Deployment</div>
+              <ul class="rm-items">
+                <li>Deploy Quick Win technologies (TRL ≥ 7)</li>
+                <li>Pilot Strategic Bets in controlled environments</li>
+                <li>Establish governance framework & KPIs</li>
+              </ul>
+            </div>
+            <div class="rm-col">
+              <div class="rm-dot"></div>
+              <div class="rm-period">Years 2–3</div>
+              <div class="rm-head">Mid-term Scaling</div>
+              <ul class="rm-items">
+                <li>Scale successful pilots to production</li>
+                <li>Build internal capability & expertise</li>
+                <li>Form strategic partnerships with innovators</li>
+              </ul>
+            </div>
+            <div class="rm-col">
+              <div class="rm-dot"></div>
+              <div class="rm-period">Year 5+</div>
+              <div class="rm-head">Long-term Leadership</div>
+              <ul class="rm-items">
+                <li>Invest in transformative innovations</li>
+                <li>Lead in selected technology domains</li>
+                <li>Continuous radar updates & portfolio rebalancing</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    function previousSlide() {
-      if (currentSlide > 0) {
-        showSlide(currentSlide - 1);
-      }
-    }
+    <!-- ── SLIDE 14: CONCLUSION ── -->
+    <div class="slide">
+      <div class="sl-inner">
+        <div class="sl-eyebrow">Conclusion</div>
+        <h2 class="sl-title">Framework Achievements</h2>
+        <p class="sl-sub">Delivering systematic intelligence for strategic technology decisions</p>
+        <div class="sl-rule"></div>
+        <div class="sl-body">
+          <div class="card-row" style="flex:0 0 auto;">
+            <div class="card"><div class="metric-val" style="font-size:28px;"><span class="accent">30</span></div><div class="card-body" style="margin-top:4px;">High-impact technologies systematically identified and ranked</div></div>
+            <div class="card"><div class="metric-val" style="font-size:28px;"><span class="accent">87%</span></div><div class="card-body" style="margin-top:4px;">Average AI consensus confidence across all assessments</div></div>
+            <div class="card"><div class="metric-val" style="font-size:28px;"><span class="accent">5</span></div><div class="card-body" style="margin-top:4px;">Balanced portfolio across all Gartner maturity phases</div></div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px;">Next Steps</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div style="display:flex; gap:8px; font-size:17px; color:var(--mist);">🎯 <span>Establish Emerging Technology Board (ETB)</span></div>
+              <div style="display:flex; gap:8px; font-size:17px; color:var(--mist);">🎯 <span>Create Technology Intelligence Unit</span></div>
+              <div style="display:flex; gap:8px; font-size:17px; color:var(--mist);">🎯 <span>Launch pilots for Quick Win technologies</span></div>
+              <div style="display:flex; gap:8px; font-size:17px; color:var(--mist);">🎯 <span>Quarterly framework updates & re-scoring</span></div>
+            </div>
+          </div>
+          <div class="green-box">
+            <p style="text-align:center; font-family:'DM Serif Display',serif; font-size:18px; color:var(--white);">From Technology Insight to Strategic Action</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    function updateButtons() {
-      document.getElementById('prevBtn').disabled = currentSlide === 0;
-      document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
-    }
+    <!-- ── SLIDE 15: THANK YOU ── -->
+    <div class="slide">
+      <div class="ty-ring"></div>
+      <div class="ty-ring"></div>
+      <div class="ty-ring"></div>
+      <div class="title-content" style="max-width:700px;">
+        <div class="title-eyebrow">Qatar Mobility Innovations Center</div>
+        <h1 class="title-h1">Thank<br><em>You</em></h1>
+        <p class="title-sub">Questions & Discussion<br>Enabling Smart & Safe Living through Innovation</p>
+        <div class="title-org">
+          <div class="title-org-dot"></div>
+          www.qmic.com
+        </div>
+      </div>
+    </div>
 
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight' || e.key === ' ') {
-        nextSlide();
-      } else if (e.key === 'ArrowLeft') {
-        previousSlide();
-      }
+  </main><!-- /stage -->
+</div><!-- /shell -->
+
+<!-- CONTROLS -->
+<div class="controls">
+  <button class="ctrl-btn" id="prevBtn" onclick="prevSlide()" disabled>←</button>
+  <div class="ctrl-counter" id="counterEl">1 / 15</div>
+  <button class="ctrl-btn" id="nextBtn" onclick="nextSlide()">→</button>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let current = 0;
+
+  // Build sidebar dots
+  const dotContainer = document.getElementById('dotContainer');
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 's-dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotContainer.appendChild(d);
+  });
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    slides[current].classList.add('prev');
+    setTimeout(() => slides[current].classList.remove('prev'), 600);
+
+    current = Math.max(0, Math.min(n, total - 1));
+    slides[current].classList.add('active');
+
+    document.querySelectorAll('.s-dot').forEach((d, i) => d.classList.toggle('active', i === current));
+    document.getElementById('counterEl').textContent = `${current + 1} / ${total}`;
+    document.getElementById('slideNumLabel').textContent = String(current + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+    document.getElementById('prevBtn').disabled = current === 0;
+    document.getElementById('nextBtn').disabled = current === total - 1;
+
+    // Animate phase bars on slide 8 (index 7)
+    if (current === 7) animatePhaseBars();
+  }
+
+  function nextSlide() { if (current < total - 1) goTo(current + 1); }
+  function prevSlide()  { if (current > 0)         goTo(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+    if (e.key === 'ArrowLeft') prevSlide();
+  });
+
+  // Phase bars
+  function animatePhaseBars() {
+    const fills = document.querySelectorAll('.phase-fill');
+    const total = Array.from(fills).reduce((s, f) => s + Number(f.dataset.count), 0);
+    fills.forEach((f, i) => {
+      const pct = (Number(f.dataset.count) / total * 100).toFixed(1);
+      setTimeout(() => { f.style.width = pct + '%'; }, i * 120);
     });
+  }
 
-    // Initialize
-    updateButtons();
-
-    // Animate phase bars on slide 7 based on the technology counts
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const fills = entry.target.querySelectorAll('.phase-fill');
-          const totalCount = Array.from(fills).reduce((sum, fill) => {
-            return sum + Number(fill.dataset.count || 0);
-          }, 0);
-
-          fills.forEach((fill, index) => {
-            const count = Number(fill.dataset.count || 0);
-            const widthPercent = totalCount > 0 ? (count / totalCount) * 100 : 0;
-            setTimeout(() => {
-              fill.style.width = `${widthPercent}%`;
-            }, index * 100);
-          });
-        }
+  // Milestone popups (slide 2)
+  const kWrap = document.querySelector('.kc-wrap');
+  if (kWrap) {
+    kWrap.addEventListener('click', () => {
+      document.querySelectorAll('.milestone-info').forEach(m => m.classList.remove('active'));
+    });
+    document.querySelectorAll('.milestone-info').forEach(m => {
+      m.addEventListener('click', e => e.stopPropagation());
+    });
+    document.querySelectorAll('.milestone-point').forEach(p => {
+      p.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = p.dataset.target;
+        document.querySelectorAll('.milestone-info').forEach(m => {
+          m.classList.toggle('active', m.id === id && !m.classList.contains('active'));
+        });
       });
     });
-
-    slides.forEach(slide => observer.observe(slide));
-  </script>
+  }
+</script>
 </body>
 </html>
