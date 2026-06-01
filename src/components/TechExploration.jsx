@@ -9,11 +9,13 @@ import {
   FileText,
   ArrowLeft,
   Wrench,
+  Target,
 } from "lucide-react";
 
 import useCSVExplorationDatasets from "./useCSVExplorationDatasets";
 import CSVUploader from "./CSVUploader";
 import { consolidateDatasets } from "./DatasetConsolidation";
+import TechRadarView from "./TechRadarView";
 
 const TechExploration = ({ setCurrentPage }) => {
   const { datasetsMap, sourceKeys, createdDate, loading, error } =
@@ -29,7 +31,7 @@ const TechExploration = ({ setCurrentPage }) => {
   const [technologies, setTechnologies] = useState([]);
   const [selectedTech, setSelectedTech] = useState(null);
   const [dragging, setDragging] = useState(null);
-  const [activeView, setActiveView] = useState("hype");
+  const [activeView, setActiveView] = useState("radar");
   const [weights, setWeights] = useState({
     trl: 0.3,
     impact: 0.3,
@@ -340,6 +342,7 @@ const TechExploration = ({ setCurrentPage }) => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex overflow-x-auto gap-2 py-3">
             {[
+              { id: "radar", label: "Tech Radar", icon: Target },
               { id: "hype", label: "Hype Cycle", icon: RefreshCw },
               { id: "table", label: "Impact Assessment", icon: FileText },
               { id: "matrix", label: "Strategic Matrix", icon: Grid },
@@ -472,6 +475,24 @@ const TechExploration = ({ setCurrentPage }) => {
           </div>
         </div>
 
+        {/* TECHNOLOGY RADAR VIEW */}
+        {activeView === "radar" && (
+          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+            <h2 className="text-3xl font-bold mb-1 text-gray-900">
+              Technology Radar
+            </h2>
+            <p className="text-gray-500 text-sm mb-6">
+              Technologies positioned by urgency (distance from centre) and
+              sized by business impact. Hover for a quick summary · Click for
+              full details.
+            </p>
+            <TechRadarView
+              filteredTech={filteredTech}
+              calculateTIS={calculateTIS}
+              categoryList={categories}
+            />
+          </div>
+        )} 
         {/* HYPE CYCLE VIEW */}
         {activeView === "hype" && (
           <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
