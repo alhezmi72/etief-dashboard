@@ -15,7 +15,7 @@ import {
 import useCSVExplorationDatasets from "./useCSVExplorationDatasets";
 import CSVUploader from "./CSVUploader";
 import { consolidateDatasets } from "./DatasetConsolidation";
-import TechRadarView from "./TechRadarView-3.jsx";
+import TechRadarView from "./TechRadarView.jsx";
 
 const TechExploration = ({ setCurrentPage }) => {
   const { datasetsMap, sourceKeys, createdDate, loading, error } =

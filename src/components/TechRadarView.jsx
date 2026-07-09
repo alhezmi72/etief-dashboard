@@ -13,6 +13,12 @@ const R_LABEL   = 510;   // tech label starts here (dotted spoke extension)
 const R_CAT_LABEL = 540; // category name arc radius
 const SVG_SIZE  = 1100;
 
+// ─── Zoom constants ────────────────────────────────────────────────────────
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 4;
+const ZOOM_STEP = 0.25;
+const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+
 const RINGS = [
   { label: "Deploy",  rInner: R_INNER,  rOuter: R_DEPLOY,  stroke: "#059669", fill: "rgba(5,150,105,0.06)",  textColor: "#065f46", dash: "none" },
   { label: "Adopt",   rInner: R_DEPLOY, rOuter: R_ADOPT,   stroke: "#2563eb", fill: "rgba(37,99,235,0.05)",  textColor: "#1e40af", dash: "6 4" },
@@ -220,6 +226,121 @@ const TechRadarView = ({ filteredTech, calculateTIS, categoryList }) => {
   const [activeRing, setActiveRing] = useState(null);
   const containerRef = useRef(null);
 
+  // ── Zoom / pan state ───────────────────────────────────────────────────────
+  const [zoom, setZoom]     = useState(1);
+  const [pan, setPan]       = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [zoomEnabled, setZoomEnabled] = useState(true);
+  const svgWrapperRef = useRef(null);
+  const svgRef         = useRef(null);
+  const panState       = useRef({ dragging: false, startX: 0, startY: 0, originX: 0, originY: 0 });
+  const pinchState     = useRef({ pinching: false, startDist: 0, startZoom: 1 });
+
+  // Reset to the default framing whenever zoom is turned off
+  useEffect(() => {
+    if (!zoomEnabled) {
+      setZoom(1);
+      setPan({ x: 0, y: 0 });
+    }
+  }, [zoomEnabled]);
+
+  // Visible viewBox dimensions/position derived from zoom + pan
+  const viewBoxW = SVG_SIZE / zoom;
+  const viewBoxH = SVG_SIZE / zoom;
+  const maxPanX  = Math.max(0, (SVG_SIZE - viewBoxW) / 2);
+  const maxPanY  = Math.max(0, (SVG_SIZE - viewBoxH) / 2);
+  const clampedPanX = clamp(pan.x, -maxPanX, maxPanX);
+  const clampedPanY = clamp(pan.y, -maxPanY, maxPanY);
+  const viewBoxX = (SVG_SIZE - viewBoxW) / 2 + clampedPanX;
+  const viewBoxY = (SVG_SIZE - viewBoxH) / 2 + clampedPanY;
+
+  const zoomIn    = useCallback(() => { if (zoomEnabled) setZoom(z => clamp(Math.round((z + ZOOM_STEP) * 100) / 100, MIN_ZOOM, MAX_ZOOM)); }, [zoomEnabled]);
+  const zoomOut   = useCallback(() => { if (zoomEnabled) setZoom(z => clamp(Math.round((z - ZOOM_STEP) * 100) / 100, MIN_ZOOM, MAX_ZOOM)); }, [zoomEnabled]);
+  const resetView = useCallback(() => { setZoom(1); setPan({ x: 0, y: 0 }); }, []);
+
+  // Scroll-wheel zoom (native listener needed since React's onWheel is passive by default)
+  useEffect(() => {
+    const el = svgWrapperRef.current;
+    if (!el || !zoomEnabled) return;
+    const onWheel = (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -ZOOM_STEP / 2 : ZOOM_STEP / 2;
+      setZoom(z => clamp(Math.round((z + delta) * 100) / 100, MIN_ZOOM, MAX_ZOOM));
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [zoomEnabled]);
+
+  // Drag-to-pan (mouse)
+  const handlePanStart = useCallback((e) => {
+    if (!zoomEnabled || zoom <= 1) return;
+    panState.current = { dragging: true, startX: e.clientX, startY: e.clientY, originX: pan.x, originY: pan.y };
+    setIsDragging(true);
+  }, [zoomEnabled, zoom, pan]);
+
+  const handlePanMove = useCallback((e) => {
+    if (!panState.current.dragging || !svgRef.current) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const scale = viewBoxW / rect.width;
+    const dx = (e.clientX - panState.current.startX) * scale;
+    const dy = (e.clientY - panState.current.startY) * scale;
+    setPan({ x: panState.current.originX - dx, y: panState.current.originY - dy });
+  }, [viewBoxW]);
+
+  const handlePanEnd = useCallback(() => {
+    panState.current.dragging = false;
+    setIsDragging(false);
+  }, []);
+
+  // Pinch-to-zoom (touch)
+  const touchDist = (t1, t2) => Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+
+  const handleTouchStart = useCallback((e) => {
+    if (!zoomEnabled) return;
+    if (e.touches.length === 2) {
+      pinchState.current = {
+        pinching: true,
+        startDist: touchDist(e.touches[0], e.touches[1]),
+        startZoom: zoom,
+      };
+    } else if (e.touches.length === 1 && zoom > 1) {
+      panState.current = {
+        dragging: true,
+        startX: e.touches[0].clientX,
+        startY: e.touches[0].clientY,
+        originX: pan.x,
+        originY: pan.y,
+      };
+    }
+  }, [zoomEnabled, zoom, pan]);
+
+  const handleTouchMove = useCallback((e) => {
+    if (!zoomEnabled) return;
+    if (pinchState.current.pinching && e.touches.length === 2) {
+      e.preventDefault();
+      const dist = touchDist(e.touches[0], e.touches[1]);
+      const ratio = dist / (pinchState.current.startDist || 1);
+      setZoom(clamp(Math.round(pinchState.current.startZoom * ratio * 100) / 100, MIN_ZOOM, MAX_ZOOM));
+    } else if (panState.current.dragging && e.touches.length === 1 && svgRef.current) {
+      const rect = svgRef.current.getBoundingClientRect();
+      const scale = viewBoxW / rect.width;
+      const dx = (e.touches[0].clientX - panState.current.startX) * scale;
+      const dy = (e.touches[0].clientY - panState.current.startY) * scale;
+      setPan({ x: panState.current.originX - dx, y: panState.current.originY - dy });
+    }
+  }, [zoomEnabled, viewBoxW]);
+
+  const handleTouchEnd = useCallback((e) => {
+    if (e.touches.length < 2) pinchState.current.pinching = false;
+    if (e.touches.length === 0) panState.current.dragging = false;
+  }, []);
+
+  // Keep pan clamped in range whenever zoom decreases
+  useEffect(() => {
+    setPan(p => ({ x: clamp(p.x, -maxPanX, maxPanX), y: clamp(p.y, -maxPanY, maxPanY) }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [zoom]);
+
   // ── Derive category list from actual data (max 8) ─────────────────────────
   const categories = useMemo(() => {
     const seen = [];
@@ -283,6 +404,17 @@ const TechRadarView = ({ filteredTech, calculateTIS, categoryList }) => {
     setMouse({ x: e.clientX, y: e.clientY });
   }, []);
 
+  // Let panning continue even if the cursor leaves the SVG while dragging
+  useEffect(() => {
+    if (!isDragging) return;
+    window.addEventListener("mousemove", handlePanMove);
+    window.addEventListener("mouseup", handlePanEnd);
+    return () => {
+      window.removeEventListener("mousemove", handlePanMove);
+      window.removeEventListener("mouseup", handlePanEnd);
+    };
+  }, [isDragging, handlePanMove, handlePanEnd]);
+
   const anyHovered = hovered !== null;
 
   // ─── Render ───────────────────────────────────────────────────────────────
@@ -310,14 +442,103 @@ const TechRadarView = ({ filteredTech, calculateTIS, categoryList }) => {
             border: "1px solid #cbd5e1", background: "transparent", color: "#64748b",
           }}>Clear</button>
         )}
-        <span style={{ marginLeft: "auto", fontSize: 11, color: "#94a3b8" }}>
-          Bubble size = business impact · Distance from centre = urgency
-        </span>
+
+        {/* ── Zoom enable/disable toggle ── */}
+        <div style={{
+          marginLeft: activeRing !== null ? 0 : "auto",
+          display: "flex", alignItems: "center", gap: 10,
+          fontSize: 12, color: "#475569",
+          padding: "4px 12px", borderRadius: 20,
+          border: "1px solid #e2e8f0", background: "#f8fafc",
+        }}>
+          <span style={{ fontWeight: 600, color: "#334155" }}>Zoom</span>
+          <label style={{ display: "flex", alignItems: "center", gap: 4, cursor: "pointer" }}>
+            <input
+              type="radio"
+              name="zoom-toggle"
+              checked={zoomEnabled}
+              onChange={() => setZoomEnabled(true)}
+              style={{ cursor: "pointer" }}
+            />
+            Enabled
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 4, cursor: "pointer" }}>
+            <input
+              type="radio"
+              name="zoom-toggle"
+              checked={!zoomEnabled}
+              onChange={() => setZoomEnabled(false)}
+              style={{ cursor: "pointer" }}
+            />
+            Disabled
+          </label>
+        </div>
+
+        {activeRing === null && (
+          <span style={{ fontSize: 11, color: "#94a3b8" }}>
+            Bubble size = business impact · Distance from centre = urgency
+          </span>
+        )}
       </div>
 
       {/* ── SVG ── */}
-      <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 14, overflow: "hidden" }}>
-        <svg viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`} width="100%" style={{ display: "block" }}>
+      <div
+        ref={svgWrapperRef}
+        style={{ position: "relative", background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 14, overflow: "hidden" }}
+      >
+        {/* ── Zoom controls ── */}
+        <div style={{
+          position: "absolute", top: 12, right: 12, zIndex: 50,
+          display: "flex", flexDirection: "column", alignItems: "stretch", gap: 1,
+          background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 10,
+          boxShadow: "0 4px 14px rgba(15,23,42,0.10)", overflow: "hidden",
+          opacity: zoomEnabled ? 1 : 0.4,
+          pointerEvents: zoomEnabled ? "auto" : "none",
+        }}>
+          <button
+            onClick={zoomIn}
+            disabled={!zoomEnabled || zoom >= MAX_ZOOM}
+            title="Zoom in"
+            style={{
+              width: 32, height: 32, border: "none", background: "transparent",
+              cursor: (!zoomEnabled || zoom >= MAX_ZOOM) ? "default" : "pointer",
+              fontSize: 16, fontWeight: 700, color: (!zoomEnabled || zoom >= MAX_ZOOM) ? "#cbd5e1" : "#334155",
+              borderBottom: "1px solid #e2e8f0",
+            }}
+          >+</button>
+          <button
+            onClick={zoomOut}
+            disabled={!zoomEnabled || zoom <= MIN_ZOOM}
+            title="Zoom out"
+            style={{
+              width: 32, height: 32, border: "none", background: "transparent",
+              cursor: (!zoomEnabled || zoom <= MIN_ZOOM) ? "default" : "pointer",
+              fontSize: 16, fontWeight: 700, color: (!zoomEnabled || zoom <= MIN_ZOOM) ? "#cbd5e1" : "#334155",
+              borderBottom: "1px solid #e2e8f0",
+            }}
+          >−</button>
+          <button
+            onClick={resetView}
+            disabled={!zoomEnabled}
+            title="Reset view"
+            style={{
+              width: 32, height: 28, border: "none", background: "transparent",
+              cursor: zoomEnabled ? "pointer" : "default", fontSize: 10, fontWeight: 600, color: "#334155",
+            }}
+          >{Math.round(zoom * 100)}%</button>
+        </div>
+
+        <svg
+          ref={svgRef}
+          viewBox={`${viewBoxX} ${viewBoxY} ${viewBoxW} ${viewBoxH}`}
+          width="100%"
+          style={{ display: "block", cursor: zoomEnabled && zoom > 1 ? (isDragging ? "grabbing" : "grab") : "default", touchAction: zoomEnabled ? "none" : "auto" }}
+          onMouseDown={handlePanStart}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onDoubleClick={resetView}
+        >
           <defs>
             {/* Arc paths for category labels */}
             {categories.map((cat, ci) => {
