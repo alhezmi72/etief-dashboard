@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   //base: './',
-  base: '/etief-dashboard/',
+  base: './',
   plugins: [
     tailwindcss(),
     react({
