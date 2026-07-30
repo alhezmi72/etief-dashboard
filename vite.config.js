@@ -6,11 +6,6 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
  //base: '/etief-dashboard/',
   base: './',
-
-  // To test with pinggy.net, you need to add the following configuration to your Vite config file:
-  //server: {
-  //  allowedHosts: ['pvgbo-80-76-163-73.free.pinggy.net'],
-  //},
   plugins: [
     tailwindcss(),
     react({
