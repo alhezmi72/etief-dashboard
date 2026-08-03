@@ -8,10 +8,6 @@ export default defineConfig({
   base: './',
   plugins: [
     tailwindcss(),
-    react({
-      babel: {
-        plugins: [['babel-plugin-react-compiler']],
-      },
-    }),
-  ]
+    react(),
+  ],
 })
